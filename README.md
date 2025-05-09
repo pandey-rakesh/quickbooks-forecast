@@ -8,7 +8,8 @@ This project provides a complete solution for sales forecasting, including:
 
 - Data exploration and visualization
 - Feature engineering for time series data
-- XGBoost model training and hyperparameter tuning
+- Multiple model training (RandomForest, XGBoost, LightGBM) and hyperparameter tuning
+- LightGBM selected as best performing model
 - REST API for making predictions
 - Command-line interface for easy interaction
 
@@ -27,8 +28,8 @@ quickbooks-forecast/
 ├── notebooks/                           # CRISP-DM + EDA workbooks
 │   ├── 01_data_exploration.ipynb        # Visualize sales, trends, categories
 │   ├── 02_feature_engineering.ipynb     # Derive model-ready features
-│   ├── 03_model_training.ipynb          # Train, validate, tune XGBoost
-│   └── 04_model_export.ipynb            # Save model.pkl for inference
+│   ├── 03_model_training.ipynb          # Train, validate, tune models (RandomForest, XGBoost, LightGBM)
+│   └── 04_future_prediction.ipynb       # Make predictions for future periods
 │
 ├── model/                               # Model and feature pipeline
 │   ├── features.py                      # Feature builder for inference
@@ -49,6 +50,14 @@ quickbooks-forecast/
 │   ├── test_feature_builder.py
 │   ├── test_model_inference.py
 │   └── test_api.py
+│
+├── src/                                 # Source code for database operations
+│   ├── db_config.py                     # Database configuration
+│   ├── db_operations.py                 # Database CRUD operations
+│   ├── store_data_in_db.py              # Script to store data in database
+│   ├── test_db_connection.py            # Test database connectivity
+│   └── feature_engineering/             # Feature engineering modules
+│       └── feature_builder.py           # Build features for model
 │
 ├── scripts/                             # Setup helpers
 │   └── generate_mock_data.py            # Generate synthetic sales data
@@ -85,7 +94,16 @@ quickbooks-forecast/
    pip install -r requirements.txt
    ```
 
-4. Generate mock data (if needed):
+4. Set up database configuration:
+   ```bash
+   # Copy the template file
+   cp src/db_config.py.template src/db_config.py
+
+   # Edit the file with your database credentials
+   # IMPORTANT: Never commit db_config.py to version control
+   ```
+
+5. Generate mock data (if needed):
    ```bash
    python scripts/generate_mock_data.py
    ```
@@ -101,6 +119,43 @@ Start the FastAPI server:
 ```
 
 The API will be available at http://localhost:8000. You can access the interactive API documentation at http://localhost:8000/docs.
+
+### Database Operations
+
+The project includes functionality to store and retrieve data from a PostgreSQL database:
+
+1. Install required dependencies:
+   ```bash
+   # Make sure you have all required dependencies installed
+   pip install -r requirements.txt
+   ```
+
+2. Set up database configuration:
+   ```bash
+   # Copy the template file
+   cp src/db_config.py.template src/db_config.py
+
+   # Edit the file with your database credentials
+   # IMPORTANT: Never commit db_config.py to version control
+   ```
+
+2. Test the database connection:
+   ```bash
+   # Test the database connection
+   python src/test_db_connection.py
+   ```
+
+3. Store engineered features in the database:
+   ```bash
+   # Store the engineered features in the database
+   python src/store_data_in_db.py
+
+   # Specify a different CSV file
+   python src/store_data_in_db.py --csv-path path/to/your/file.csv
+
+   # Force overwrite of existing data without prompting
+   python src/store_data_in_db.py --force
+   ```
 
 ### Using the CLI
 
@@ -146,7 +201,7 @@ The Jupyter notebooks in the `notebooks/` directory provide a step-by-step walkt
 1. Data exploration and visualization
 2. Feature engineering
 3. Model training and tuning
-4. Model export
+4. Future prediction
 
 ## License
 
