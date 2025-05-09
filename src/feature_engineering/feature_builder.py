@@ -38,7 +38,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 class FeatureBuilder:
     """
     A class to build features for the sales forecasting model.
