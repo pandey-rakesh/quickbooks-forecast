@@ -32,24 +32,20 @@ quickbooks-forecast/
 │   └── 04_future_prediction.ipynb       # Make predictions for future periods
 │
 ├── model/                               # Model and feature pipeline
-│   ├── features.py                      # Feature builder for inference
-│   ├── train_model.py                   # Script version of notebook #3
-│   └── model.pkl                        # Trained model artifact
+│   ├── feature_columns.pkl              # Saved feature columns for model
+│   ├── model.pkl                        # Trained model artifact
+│   └── model_info.json                  # Model metadata and information
 │
 ├── app/                                 # REST API microservice
 │   ├── main.py                          # FastAPI app instance
-│   ├── api.py                           # `/predict-top-categories` endpoint
+│   ├── api.py                           # API endpoints
 │   ├── service.py                       # Core business logic
 │   ├── utils.py                         # Date filters, helpers, mappers
-│   └── config.py                        # Central config (paths, thresholds)
-│
-├── ui/                                  # CLI interface
-│   └── cli.py                           # Command-line interface
+│   ├── config.py                        # Central config (paths, thresholds)
+│   └── models.py                        # Data models for API
 │
 ├── tests/                               # Unit & integration tests
-│   ├── test_feature_builder.py
-│   ├── test_model_inference.py
-│   └── test_api.py
+│   └── __pycache__/                     # Python cache directory
 │
 ├── src/                                 # Source code for database operations
 │   ├── db_config.py                     # Database configuration
@@ -60,7 +56,7 @@ quickbooks-forecast/
 │       └── feature_builder.py           # Build features for model
 │
 ├── scripts/                             # Setup helpers
-│   └── generate_mock_data.py            # Generate synthetic sales data
+│   └── run_demo.sh                      # Script to run the demo
 │
 ├── Dockerfile                           # Containerize application for deployment
 ├── requirements.txt                     # Python dependencies
@@ -96,16 +92,22 @@ quickbooks-forecast/
 
 4. Set up database configuration:
    ```bash
-   # Copy the template file
-   cp src/db_config.py.template src/db_config.py
+   # Edit the database configuration in src/db_config.py
+   # The default configuration uses:
+   # - PostgreSQL database
+   # - Host: localhost
+   # - Database: quickbooks_forecast
+   # - Username: postgres
+   # - Password: postgres
 
-   # Edit the file with your database credentials
-   # IMPORTANT: Never commit db_config.py to version control
+   # IMPORTANT: Update the credentials for your environment
+   # IMPORTANT: Never commit sensitive credentials to version control
    ```
 
-5. Generate mock data (if needed):
+5. Load sample data into the database:
    ```bash
-   python scripts/generate_mock_data.py
+   # Store the sample data in the database
+   python src/store_data_in_db.py
    ```
 
 ## Usage
@@ -120,6 +122,102 @@ Start the FastAPI server:
 
 The API will be available at http://localhost:8000. You can access the interactive API documentation at http://localhost:8000/docs.
 
+### API Endpoints
+
+The API provides the following endpoints:
+
+#### GET /api/v1/predict-top-categories
+
+Predict the top categories by sales amount for a future period.
+
+**Query Parameters:**
+- `start_date` (optional): Start date in ISO format (YYYY-MM-DD)
+- `end_date` (optional): End date in ISO format (YYYY-MM-DD)
+- `days` (optional, default: 30): Number of days to forecast if start_date is not provided
+- `top_n` (optional, default: 5): Number of top categories to return
+- `include_historical` (optional, default: false): Include historical data for comparison
+
+**Example Response:**
+```json
+{
+  "period": {
+    "start_date": "2023-02-01",
+    "end_date": "2023-02-28",
+    "days": 28
+  },
+  "total_predicted_sales": 12000.0,
+  "total_predicted_sales_formatted": "$12,000.00",
+  "predicted_top_categories": [
+    {
+      "category": "Electronics",
+      "amount": 6000.0,
+      "percentage": 50.0,
+      "confidence": 0.9
+    },
+    {
+      "category": "Clothing",
+      "amount": 3600.0,
+      "percentage": 30.0,
+      "confidence": 0.85
+    }
+  ],
+  "model_info": {
+    "model_type": "XGBRegressor",
+    "training_date": "2023-01-15",
+    "feature_count": 20
+  }
+}
+```
+
+#### GET /api/v1/historical-top-categories
+
+Get the top categories by sales amount for a historical period.
+
+**Query Parameters:**
+- `start_date` (optional): Start date in ISO format (YYYY-MM-DD)
+- `end_date` (optional): End date in ISO format (YYYY-MM-DD)
+- `days` (optional, default: 30): Number of days to include if start_date is not provided
+- `top_n` (optional, default: 5): Number of top categories to return
+
+#### GET /api/v1/model-info
+
+Get information about the loaded model.
+
+#### GET /api/v1/categories/top
+
+Get top-N predicted categories for a time frame.
+
+**Query Parameters:**
+- `range` (required): Time range (week, month, quarter, year, custom)
+- `start_date` (required for custom range): Start date for custom range (YYYY-MM-DD)
+- `end_date` (required for custom range): End date for custom range (YYYY-MM-DD)
+- `top_n` (optional, default: 5): Number of top categories to return
+
+**Example Response:**
+```json
+{
+  "range": "month",
+  "start_date": "2025-05-01",
+  "end_date": "2025-05-31",
+  "top_categories": [
+    {"category": "Beauty", "revenue": 45230.45},
+    {"category": "Books", "revenue": 38423.11},
+    {"category": "Clothing", "revenue": 36891.89}
+  ]
+}
+```
+
+#### GET /api/v1/categories/time-series-plot
+
+Generate time series data for top N categories showing historical and predicted data.
+
+**Query Parameters:**
+- `start_date` (optional): Start date for prediction in ISO format (YYYY-MM-DD)
+- `end_date` (optional): End date for prediction in ISO format (YYYY-MM-DD)
+- `days` (optional, default: 30): Number of days to forecast if start_date is not provided
+- `top_n` (optional, default: 5): Number of top categories to show
+- `historical_days` (optional, default: 180): Number of days of historical data to include
+
 ### Database Operations
 
 The project includes functionality to store and retrieve data from a PostgreSQL database:
@@ -132,14 +230,19 @@ The project includes functionality to store and retrieve data from a PostgreSQL 
 
 2. Set up database configuration:
    ```bash
-   # Copy the template file
-   cp src/db_config.py.template src/db_config.py
+   # Edit the database configuration in src/db_config.py
+   # The default configuration uses:
+   # - PostgreSQL database
+   # - Host: localhost
+   # - Database: quickbooks_forecast
+   # - Username: postgres
+   # - Password: postgres
 
-   # Edit the file with your database credentials
-   # IMPORTANT: Never commit db_config.py to version control
+   # IMPORTANT: Update the credentials for your environment
+   # IMPORTANT: Never commit sensitive credentials to version control
    ```
 
-2. Test the database connection:
+3. Test the database connection:
    ```bash
    # Test the database connection
    python src/test_db_connection.py
@@ -188,7 +291,17 @@ docker run -p 8000:8000 quickbooks-forecast
 
 ### Running Tests
 
-Run the test suite:
+The project includes a test framework, but test files need to be created:
+
+```bash
+# Create a test directory if it doesn't exist
+mkdir -p tests
+
+# Create test files as needed
+# Example: touch tests/test_api.py
+```
+
+Once test files are created, you can run the test suite:
 
 ```bash
 pytest tests/
