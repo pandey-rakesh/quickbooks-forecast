@@ -6,7 +6,6 @@ including storing and retrieving historical sales data.
 """
 
 import pandas as pd
-import logging
 import os
 from sqlalchemy import Column, Integer, Float, String, Date, ForeignKey, text
 from sqlalchemy.orm import relationship
@@ -14,21 +13,14 @@ from sqlalchemy.orm import relationship
 # Import database configuration
 from src.db_config import DB_PARAMS, ENGINE, Base, get_db_session
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
 def get_db_connection():
     try:
         # Create connection using SQLAlchemy
         conn = ENGINE.connect()
-        logger.info(f"Successfully connected to PostgreSQL database: {DB_PARAMS['connection_string']}")
+        print(f"Successfully connected to PostgreSQL database: {DB_PARAMS['connection_string']}")
         return conn
     except Exception as e:
-        logger.error(f"Error connecting to database: {e}")
+        print(f"Error connecting to database: {e}")
         raise
 
 # Define SQLAlchemy models
@@ -172,24 +164,24 @@ def create_tables(conn=None, force=False):
 
         # Drop tables if force is True
         if force:
-            logger.info("Dropping existing tables")
+            print("Dropping existing tables")
             Base.metadata.drop_all(bind=ENGINE, tables=[
                 HistoricalSales.__table__,
                 Predictions.__table__
             ])
-            logger.info("Tables dropped successfully")
+            print("Tables dropped successfully")
 
         # Create tables
-        logger.info("Creating tables")
+        print("Creating tables")
         Base.metadata.create_all(bind=ENGINE)
-        logger.info("Database tables created successfully")
+        print("Database tables created successfully")
 
         # Close connection if we created it
         if connection_created:
             conn.close()
 
     except Exception as e:
-        logger.error(f"Error creating database tables: {e}")
+        print(f"Error creating database tables: {e}")
         if 'conn' in locals() and conn and connection_created:
             conn.close()
         raise
@@ -217,7 +209,7 @@ def store_historical_sales(csv_path, conn=None, force=False):
         create_tables(conn, force=force)
 
         # Read CSV file
-        logger.info(f"Reading historical sales data from {csv_path}")
+        print(f"Reading historical sales data from {csv_path}")
         df = pd.read_csv(csv_path, parse_dates=['date'])
 
         # Remove columns that don't exist in the table
@@ -225,7 +217,7 @@ def store_historical_sales(csv_path, conn=None, force=False):
         for col in columns_to_remove:
             if col in df.columns:
                 df = df.drop(columns=[col])
-                logger.info(f"Removed column {col} from DataFrame")
+                print(f"Removed column {col} from DataFrame")
 
         # Ensure date column is in datetime format for PostgreSQL Date type
         if not pd.api.types.is_datetime64_any_dtype(df['date']):
@@ -238,13 +230,13 @@ def store_historical_sales(csv_path, conn=None, force=False):
         existing_count = session.query(HistoricalSales).count()
 
         if existing_count > 0:
-            logger.warning(f"Database already contains {existing_count} rows of data")
+            print(f"Database already contains {existing_count} rows of data")
 
             # If force is False, prompt the user
             if not force:
                 user_input = input("Do you want to delete existing data and insert new data? (y/n): ")
                 if user_input.lower() != 'y':
-                    logger.info("Operation cancelled by user")
+                    print("Operation cancelled by user")
                     session.close()
                     if connection_created:
                         conn.close()
@@ -253,10 +245,10 @@ def store_historical_sales(csv_path, conn=None, force=False):
             # Delete existing data
             session.query(HistoricalSales).delete()
             session.commit()
-            logger.info("Existing data deleted")
+            print("Existing data deleted")
 
         # Insert data into database
-        logger.info(f"Inserting {len(df)} rows into database")
+        print(f"Inserting {len(df)} rows into database")
 
         # Convert DataFrame to list of dictionaries
         records = df.to_dict('records')
@@ -279,11 +271,11 @@ def store_historical_sales(csv_path, conn=None, force=False):
         if connection_created:
             conn.close()
 
-        logger.info(f"Successfully inserted {inserted_count} rows into database")
+        print(f"Successfully inserted {inserted_count} rows into database")
         return inserted_count
 
     except Exception as e:
-        logger.error(f"Error storing historical sales data: {e}")
+        print(f"Error storing historical sales data: {e}")
         if 'session' in locals() and session:
             session.rollback()
             session.close()
@@ -337,7 +329,7 @@ def get_historical_sales(start_date=None, end_date=None, conn=None):
         query = query.order_by(HistoricalSales.date)
 
         # Execute query
-        logger.info(f"Retrieving historical sales data from database")
+        print(f"Retrieving historical sales data from database")
         results = query.all()
 
         # Convert results to DataFrame
@@ -363,12 +355,12 @@ def get_historical_sales(start_date=None, end_date=None, conn=None):
         if connection_created:
             conn.close()
 
-        logger.info(f"Retrieved {len(df)} rows from database")
-        logger.info(f"Columns in historical_sales table: {df.columns.tolist()}")
+        print(f"Retrieved {len(df)} rows from database")
+        print(f"Columns in historical_sales table: {df.columns.tolist()}")
         return df
 
     except Exception as e:
-        logger.error(f"Error retrieving historical sales data: {e}")
+        print(f"Error retrieving historical sales data: {e}")
         if 'session' in locals() and session:
             session.close()
         if 'conn' in locals() and conn and connection_created:
@@ -398,12 +390,12 @@ def populate_categories_and_products(sales_csv_path, conn=None, force=False):
         create_tables(conn, force=force)
 
         # Read CSV file
-        logger.info(f"Reading sales data from {sales_csv_path}")
+        print(f"Reading sales data from {sales_csv_path}")
         df = pd.read_csv(sales_csv_path, parse_dates=['date'])
 
         # Extract distinct categories
         categories = df['category'].unique().tolist()
-        logger.info(f"Found {len(categories)} distinct categories")
+        print(f"Found {len(categories)} distinct categories")
 
         # Create a session
         session = get_db_session()
@@ -422,11 +414,11 @@ def populate_categories_and_products(sales_csv_path, conn=None, force=False):
                     session.add(new_category)
                     categories_inserted += 1
             except Exception as e:
-                logger.error(f"Error inserting category {category_name}: {e}")
+                print(f"Error inserting category {category_name}: {e}")
 
         # Commit to get IDs for new categories
         session.commit()
-        logger.info(f"Inserted {categories_inserted} categories into database")
+        print(f"Inserted {categories_inserted} categories into database")
 
         # Get category IDs
         category_map = {}
@@ -435,7 +427,7 @@ def populate_categories_and_products(sales_csv_path, conn=None, force=False):
 
         # Extract distinct products per category
         products_df = df[['category', 'product']].drop_duplicates()
-        logger.info(f"Found {len(products_df)} distinct products")
+        print(f"Found {len(products_df)} distinct products")
 
         # Insert products into database
         products_inserted = 0
@@ -462,13 +454,13 @@ def populate_categories_and_products(sales_csv_path, conn=None, force=False):
                         session.add(new_product)
                         products_inserted += 1
                 except Exception as e:
-                    logger.error(f"Error inserting product {product_name} for category {category_name}: {e}")
+                    print(f"Error inserting product {product_name} for category {category_name}: {e}")
             else:
-                logger.error(f"Category ID not found for category: {category_name}")
+                print(f"Category ID not found for category: {category_name}")
 
         # Commit changes
         session.commit()
-        logger.info(f"Inserted {products_inserted} products into database")
+        print(f"Inserted {products_inserted} products into database")
 
         # Close session
         session.close()
@@ -480,7 +472,7 @@ def populate_categories_and_products(sales_csv_path, conn=None, force=False):
         return (categories_inserted, products_inserted)
 
     except Exception as e:
-        logger.error(f"Error populating categories and products: {e}")
+        print(f"Error populating categories and products: {e}")
         if 'session' in locals() and session:
             session.rollback()
             session.close()
@@ -509,7 +501,7 @@ def get_categories(conn=None):
         session = get_db_session()
 
         # Execute query
-        logger.info("Retrieving categories from database")
+        print("Retrieving categories from database")
         categories = session.query(Category).order_by(Category.name).all()
 
         # Convert results to DataFrame
@@ -529,11 +521,11 @@ def get_categories(conn=None):
         if connection_created:
             conn.close()
 
-        logger.info(f"Retrieved {len(df)} categories from database")
+        print(f"Retrieved {len(df)} categories from database")
         return df
 
     except Exception as e:
-        logger.error(f"Error retrieving categories: {e}")
+        print(f"Error retrieving categories: {e}")
         if 'session' in locals() and session:
             session.close()
         if 'conn' in locals() and conn and connection_created:
@@ -569,13 +561,13 @@ def store_predictions(df, conn=None, force=False):
         existing_count = session.query(Predictions).count()
 
         if existing_count > 0:
-            logger.warning(f"Predictions table already contains {existing_count} rows of data")
+            print(f"Predictions table already contains {existing_count} rows of data")
 
             # If force is False, prompt the user
             if not force:
                 user_input = input("Do you want to delete existing prediction data and insert new data? (y/n): ")
                 if user_input.lower() != 'y':
-                    logger.info("Operation cancelled by user")
+                    print("Operation cancelled by user")
                     session.close()
                     if connection_created:
                         conn.close()
@@ -584,7 +576,7 @@ def store_predictions(df, conn=None, force=False):
             # Delete existing data
             session.query(Predictions).delete()
             session.commit()
-            logger.info("Existing prediction data deleted")
+            print("Existing prediction data deleted")
 
         # Ensure date column is in datetime format for PostgreSQL Date type
         if 'date' in df.columns:
@@ -596,18 +588,18 @@ def store_predictions(df, conn=None, force=False):
         for col in columns_to_remove:
             if col in df.columns:
                 df = df.drop(columns=[col])
-                logger.info(f"Removed column {col} from DataFrame")
+                print(f"Removed column {col} from DataFrame")
 
         # Check for duplicate dates
         duplicate_dates = df['date'].duplicated()
         if duplicate_dates.any():
-            logger.warning(f"Found {duplicate_dates.sum()} duplicate dates in predictions DataFrame")
-            logger.warning(f"Example duplicate date: {df.loc[duplicate_dates, 'date'].iloc[0]}")
-            logger.warning("Dropping duplicate dates from predictions DataFrame")
+            print(f"Found {duplicate_dates.sum()} duplicate dates in predictions DataFrame")
+            print(f"Example duplicate date: {df.loc[duplicate_dates, 'date'].iloc[0]}")
+            print("Dropping duplicate dates from predictions DataFrame")
             df = df.drop_duplicates(subset=['date'])
 
         # Insert data into database
-        logger.info(f"Inserting {len(df)} rows into predictions table")
+        print(f"Inserting {len(df)} rows into predictions table")
 
         # Convert DataFrame to list of dictionaries
         records = df.to_dict('records')
@@ -630,11 +622,11 @@ def store_predictions(df, conn=None, force=False):
         if connection_created:
             conn.close()
 
-        logger.info(f"Successfully inserted {inserted_count} rows into predictions table")
+        print(f"Successfully inserted {inserted_count} rows into predictions table")
         return inserted_count
 
     except Exception as e:
-        logger.error(f"Error storing prediction data: {e}")
+        print(f"Error storing prediction data: {e}")
         if 'session' in locals() and session:
             session.rollback()
             session.close()
@@ -688,7 +680,7 @@ def get_predictions(start_date=None, end_date=None, conn=None):
         query = query.order_by(Predictions.date)
 
         # Execute query
-        logger.info(f"Retrieving prediction data from database")
+        print(f"Retrieving prediction data from database")
         results = query.all()
 
         # Convert results to DataFrame
@@ -714,14 +706,14 @@ def get_predictions(start_date=None, end_date=None, conn=None):
         if connection_created:
             conn.close()
 
-        logger.info(f"Retrieved {len(df)} rows from predictions table")
+        print(f"Retrieved {len(df)} rows from predictions table")
         if not df.empty:
-            logger.info(f"Date range: {df['date'].min()} to {df['date'].max()}")
-            logger.info(f"Columns in predictions table: {df.columns.tolist()}")
+            print(f"Date range: {df['date'].min()} to {df['date'].max()}")
+            print(f"Columns in predictions table: {df.columns.tolist()}")
         return df
 
     except Exception as e:
-        logger.error(f"Error retrieving prediction data: {e}")
+        print(f"Error retrieving prediction data: {e}")
         if 'session' in locals() and session:
             session.close()
         if 'conn' in locals() and conn and connection_created:
@@ -761,7 +753,7 @@ def get_products(category_id=None, conn=None):
         query = query.order_by(Category.name, Product.name)
 
         # Execute query
-        logger.info(f"Retrieving products from database")
+        print(f"Retrieving products from database")
         results = query.all()
 
         # Convert results to DataFrame
@@ -782,11 +774,11 @@ def get_products(category_id=None, conn=None):
         if connection_created:
             conn.close()
 
-        logger.info(f"Retrieved {len(df)} products from database")
+        print(f"Retrieved {len(df)} products from database")
         return df
 
     except Exception as e:
-        logger.error(f"Error retrieving products: {e}")
+        print(f"Error retrieving products: {e}")
         if 'session' in locals() and session:
             session.close()
         if 'conn' in locals() and conn and connection_created:
