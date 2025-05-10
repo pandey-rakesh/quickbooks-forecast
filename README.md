@@ -188,7 +188,7 @@ Get information about the loaded model.
 Get top-N predicted categories for a time frame.
 
 **Query Parameters:**
-- `range` (required): Time range (week, month, quarter, year, custom)
+- `range` (optional, default: "month"): Time range (week, month, quarter, year, custom)
 - `start_date` (required for custom range): Start date for custom range (YYYY-MM-DD)
 - `end_date` (required for custom range): End date for custom range (YYYY-MM-DD)
 - `top_n` (optional, default: 5): Number of top categories to return

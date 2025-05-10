@@ -123,7 +123,7 @@ async def model_info():
 
 @router.get("/categories/top")
 async def get_top_categories_for_range(
-        range: str = Query(..., description="Time range (week, month, quarter, year, custom)"),
+        range: str = Query("month", description="Time range (week, month, quarter, year, custom)"),
         start_date: Optional[str] = Query(None, description="Start date for custom range (YYYY-MM-DD)"),
         end_date: Optional[str] = Query(None, description="End date for custom range (YYYY-MM-DD)"),
         top_n: int = Query(DEFAULT_TOP_CATEGORIES, description="Number of top categories to return")
@@ -132,7 +132,7 @@ async def get_top_categories_for_range(
     Get top-N predicted categories for a time frame.
 
     Args:
-        range (str): Time range (week, month, quarter, year, custom)
+        range (str, optional): Time range (week, month, quarter, year, custom). Defaults to "month".
         start_date (str, optional): Start date for custom range (YYYY-MM-DD)
         end_date (str, optional): End date for custom range (YYYY-MM-DD)
         top_n (int, optional): Number of top categories to return
@@ -277,4 +277,3 @@ async def time_series_plot(
         # Handle any other unexpected exceptions
         logging.error(f"Error in time-series-plot endpoint: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
