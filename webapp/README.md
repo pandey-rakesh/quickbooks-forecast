@@ -1,6 +1,44 @@
-# Getting Started with Create React App
+# QuickBooks Sales Forecasting Web Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the frontend web application for the QuickBooks Sales Forecasting project. It provides a user-friendly interface to visualize sales forecasts and historical data.
+
+## Features
+
+- Interactive dashboard for sales forecasting visualization
+- Time range selector for different forecast periods (week, month, quarter, year, custom)
+- Bar chart displaying top categories by sales
+- Time series chart showing historical and predicted sales trends
+- Forecast details including model information
+
+## Technology Stack
+
+- React.js - Frontend framework
+- Material UI - Component library with QuickBooks theming
+- Recharts - Data visualization library
+- Axios - API client for backend communication
+- React Router - Navigation and routing
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 14.x or higher
+- npm 6.x or higher
+- Backend API server running on http://localhost:8000
+
+### Installation
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm start
+   ```
+
+3. Open [http://localhost:3000](http://localhost:3000) to view the application in your browser.
 
 ## Available Scripts
 
@@ -27,44 +65,47 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Project Structure
 
-### `npm run eject`
+```
+webapp/
+├── public/                 # Static files
+├── src/                    # Source code
+│   ├── components/         # React components
+│   │   ├── Dashboard.js    # Main dashboard component
+│   │   ├── TimeRangeSelector.js # Time range selection component
+│   │   ├── CategoryBarChart.js  # Bar chart for categories
+│   │   ├── TimeSeriesChart.js   # Time series chart component
+│   │   ├── Header.js      # Application header
+│   │   └── Footer.js      # Application footer
+│   ├── services/          # API services
+│   │   └── api.js         # API client for backend communication
+│   ├── styles/            # CSS styles
+│   ├── App.js             # Main application component
+│   └── index.js           # Application entry point
+├── package.json           # Project dependencies and scripts
+└── README.md              # Project documentation
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## API Integration
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The web application communicates with the backend API to fetch forecast data. The API endpoints used include:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- `/api/v1/categories/top` - Get top categories for a time period
+- `/api/v1/categories/time-series-plot` - Get time series data for categories
+- `/api/v1/model-info` - Get information about the forecast model
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Deployment
 
-## Learn More
+For production deployment:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Build the application:
+   ```bash
+   npm run build
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Serve the static files from the `build` directory using a web server of your choice.
 
-### Code Splitting
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the MIT License - see the LICENSE file for details.
