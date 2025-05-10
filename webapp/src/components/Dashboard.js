@@ -80,10 +80,10 @@ const Dashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mb: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          QuickBooks Sales Forecasting
+          Sales Forecast
         </Typography>
         <Typography variant="subtitle1" color="textSecondary">
           Predict top-selling categories to optimize your inventory and marketing strategy
