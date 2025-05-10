@@ -34,23 +34,23 @@ def setup_logger(name: str) -> logging.Logger:
 
 
 def parse_date_range(
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
-    days: int = 30
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        days: int = 30
 ) -> Tuple[datetime, datetime]:
     """
     Parse and validate date range parameters.
-    
+
     Args:
         start_date (str, optional): Start date in ISO format (YYYY-MM-DD)
         end_date (str, optional): End date in ISO format (YYYY-MM-DD)
         days (int): Number of days to include if start_date is not provided
-        
+
     Returns:
         tuple: (start_date, end_date) as datetime objects
     """
     today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
     if end_date:
         try:
             end_dt = pd.to_datetime(end_date)
@@ -59,7 +59,7 @@ def parse_date_range(
             end_dt = today
     else:
         end_dt = today
-    
+
     if start_date:
         try:
             start_dt = pd.to_datetime(start_date)
@@ -68,12 +68,12 @@ def parse_date_range(
             start_dt = end_dt - timedelta(days=days)
     else:
         start_dt = end_dt - timedelta(days=days)
-    
+
     # Ensure start_date is before end_date
     if start_dt > end_dt:
         logger.warning(f"start_date {start_dt} is after end_date {end_dt}, swapping dates")
         start_dt, end_dt = end_dt, start_dt
-    
+
     return start_dt, end_dt
 
 

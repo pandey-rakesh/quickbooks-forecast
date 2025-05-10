@@ -3,10 +3,10 @@ import { Container, Grid, Paper, Typography, Box } from '@mui/material';
 import TimeRangeSelector from './TimeRangeSelector';
 import CategoryBarChart from './CategoryBarChart';
 import TimeSeriesChart from './TimeSeriesChart';
-import CategoryTable from './CategoryTable';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import ApiService from '../services/api';
+import { format, parseISO } from 'date-fns'; // Import date-fns functions
 
 const Dashboard = () => {
   // State
@@ -68,6 +68,17 @@ const Dashboard = () => {
     }
   };
 
+  // Format date in a user-friendly way
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      return format(parseISO(dateString), 'MMMM dd, yyyy');  // Format as "May 09, 2025"
+    } catch (e) {
+      console.error("Date format error:", e);
+      return dateString;
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ mb: 4 }}>
@@ -116,7 +127,7 @@ const Dashboard = () => {
               {topCategories && (
                 <Box>
                   <Typography variant="body1">
-                    <strong>Period:</strong> {topCategories.start_date} to {topCategories.end_date}
+                    <strong>Period:</strong> {formatDate(topCategories.start_date)} to {formatDate(topCategories.end_date)}
                   </Typography>
                   <Typography variant="body1" sx={{ mt: 1 }}>
                     <strong>Range:</strong> {topCategories.range.charAt(0).toUpperCase() + topCategories.range.slice(1)}
@@ -128,7 +139,7 @@ const Dashboard = () => {
                         <strong>Model:</strong> {modelInfo.model_type}
                       </Typography>
                       <Typography variant="body1">
-                        <strong>Training Date:</strong> {modelInfo.training_date}
+                        <strong>Training Date:</strong> {formatDate(modelInfo.training_date)}
                       </Typography>
                       <Typography variant="body1">
                         <strong>Feature Count:</strong> {modelInfo.feature_count}
@@ -147,21 +158,9 @@ const Dashboard = () => {
                 Sales Trend Over Time
               </Typography>
               {timeSeriesData && (
-                <Box sx={{ height: 400 }}>
+                <Box sx={{ height: 450 }}>
                   <TimeSeriesChart data={timeSeriesData} />
                 </Box>
-              )}
-            </Paper>
-          </Grid>
-
-          {/* Categories Table */}
-          <Grid item xs={12}>
-            <Paper elevation={2} sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Top Categories Details
-              </Typography>
-              {topCategories && (
-                <CategoryTable categories={topCategories.top_categories} />
               )}
             </Paper>
           </Grid>

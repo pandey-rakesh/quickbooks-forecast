@@ -15,8 +15,8 @@ const Header = () => {
       <Toolbar>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <ShowChartIcon sx={{ mr: 1 }} />
-          <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'white' }}>
-            QuickBooks Forecast
+          <Typography variant="h4" component={Link} to="/" sx={{ textDecoration: 'none', color: 'white' }}>
+            QuickBooks
           </Typography>
         </Box>
 
