@@ -77,10 +77,13 @@ webapp/
 │   │   ├── CategoryBarChart.js  # Bar chart for categories
 │   │   ├── TimeSeriesChart.js   # Time series chart component
 │   │   ├── Header.js      # Application header
-│   │   └── Footer.js      # Application footer
+│   │   ├── Footer.js      # Application footer
+│   │   ├── ErrorMessage.js # Error display component
+│   │   └── LoadingSpinner.js # Loading indicator component
 │   ├── services/          # API services
 │   │   └── api.js         # API client for backend communication
 │   ├── styles/            # CSS styles
+│   ├── utils/             # Utility functions
 │   ├── App.js             # Main application component
 │   └── index.js           # Application entry point
 ├── package.json           # Project dependencies and scripts

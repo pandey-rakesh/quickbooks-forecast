@@ -44,17 +44,19 @@ quickbooks-forecast/
 │   ├── config.py                        # Central config (paths, thresholds)
 │   └── models.py                        # Data models for API
 │
+├── logs/                                # Application logs
+│
 ├── webapp/                              # React frontend application
 │   ├── public/                          # Static files
 │   ├── src/                             # Source code
 │   │   ├── components/                  # React components
 │   │   ├── services/                    # API services
-│   │   └── styles/                      # CSS styles
+│   │   ├── styles/                      # CSS styles
+│   │   └── utils/                       # Utility functions
 │   ├── package.json                     # Frontend dependencies
 │   └── README.md                        # Frontend documentation
 │
 ├── tests/                               # Unit & integration tests
-│   └── __pycache__/                     # Python cache directory
 │
 ├── src/                                 # Source code for database operations
 │   ├── db_config.py                     # Database configuration
@@ -68,6 +70,7 @@ quickbooks-forecast/
 │   └── run_demo.sh                      # Script to run the demo
 │
 ├── Dockerfile                           # Containerize application for deployment
+├── LICENSE                              # MIT License file
 ├── requirements.txt                     # Python dependencies
 ├── run_demo.sh                          # Launch CLI or API locally
 └── README.md                            # Project documentation
@@ -84,7 +87,7 @@ quickbooks-forecast/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/quickbooks-forecast.git
+   git clone https://github.com/intuit/quickbooks-forecast.git
    cd quickbooks-forecast
    ```
 
@@ -300,20 +303,17 @@ docker run -p 8000:8000 quickbooks-forecast
 
 ### Running Tests
 
-The project includes a test framework, but test files need to be created:
+The project has a test framework set up, but currently contains limited test files. To run the existing tests:
 
 ```bash
-# Create a test directory if it doesn't exist
-mkdir -p tests
-
-# Create test files as needed
-# Example: touch tests/test_api.py
+pytest
 ```
 
-Once test files are created, you can run the test suite:
+To add new tests:
 
 ```bash
-pytest tests/
+# Create test files in the tests directory
+# Example: touch tests/test_api.py
 ```
 
 ### Notebooks
