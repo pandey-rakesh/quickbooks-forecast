@@ -19,7 +19,6 @@ class CategorySales(BaseModel):
     category: str
     amount: float
     percentage: float
-    confidence: Optional[float] = None
 
 class ModelInfo(BaseModel):
     """Model information model."""

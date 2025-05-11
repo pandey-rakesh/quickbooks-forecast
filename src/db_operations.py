@@ -9,13 +9,15 @@ import pandas as pd
 import os
 from sqlalchemy import Column, Integer, Float, String, Date, ForeignKey, text
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
 # Import database configuration
 from src.db_config import DB_PARAMS, ENGINE, Base, get_db_session
 
+
 def get_db_connection():
+    """Create and return a database connection."""
     try:
-        # Create connection using SQLAlchemy
         conn = ENGINE.connect()
         print(f"Successfully connected to PostgreSQL database: {DB_PARAMS['connection_string']}")
         return conn
@@ -23,13 +25,14 @@ def get_db_connection():
         print(f"Error connecting to database: {e}")
         raise
 
-# Define SQLAlchemy models
+
 class HistoricalSales(Base):
-    """SQLAlchemy model for historical_sales table."""
-    __tablename__ = "historical_sales"
+    """Model for historical sales data."""
+    __tablename__ = 'historical_sales'
 
     date = Column(Date, primary_key=True)
-    total_sales = Column(Float)
+
+    # Category sales columns
     Beauty = Column(Float)
     Books = Column(Float)
     Clothing = Column(Float)
@@ -38,46 +41,232 @@ class HistoricalSales(Base):
     Groceries = Column(Float)
     Sports = Column(Float)
     Toys = Column(Float)
+
+    # Category units columns
+    Beauty_units = Column(Float)
+    Books_units = Column(Float)
+    Clothing_units = Column(Float)
+    Electronics_units = Column(Float)
+    Furniture_units = Column(Float)
+    Groceries_units = Column(Float)
+    Sports_units = Column(Float)
+    Toys_units = Column(Float)
+
+    # Category lag features
+    Beauty_lag_1d = Column(Float)
+    Books_lag_1d = Column(Float)
+    Clothing_lag_1d = Column(Float)
+    Electronics_lag_1d = Column(Float)
+    Furniture_lag_1d = Column(Float)
+    Groceries_lag_1d = Column(Float)
+    Sports_lag_1d = Column(Float)
+    Toys_lag_1d = Column(Float)
+
+    # Category units lag features
+    Beauty_units_lag_1d = Column(Float)
+    Books_units_lag_1d = Column(Float)
+    Clothing_units_lag_1d = Column(Float)
+    Electronics_units_lag_1d = Column(Float)
+    Furniture_units_lag_1d = Column(Float)
+    Groceries_units_lag_1d = Column(Float)
+    Sports_units_lag_1d = Column(Float)
+    Toys_units_lag_1d = Column(Float)
+
+    Beauty_lag_7d = Column(Float)
+    Books_lag_7d = Column(Float)
+    Clothing_lag_7d = Column(Float)
+    Electronics_lag_7d = Column(Float)
+    Furniture_lag_7d = Column(Float)
+    Groceries_lag_7d = Column(Float)
+    Sports_lag_7d = Column(Float)
+    Toys_lag_7d = Column(Float)
+
+    # Category units lag 7d features
+    Beauty_units_lag_7d = Column(Float)
+    Books_units_lag_7d = Column(Float)
+    Clothing_units_lag_7d = Column(Float)
+    Electronics_units_lag_7d = Column(Float)
+    Furniture_units_lag_7d = Column(Float)
+    Groceries_units_lag_7d = Column(Float)
+    Sports_units_lag_7d = Column(Float)
+    Toys_units_lag_7d = Column(Float)
+
+    Beauty_lag_14d = Column(Float)
+    Books_lag_14d = Column(Float)
+    Clothing_lag_14d = Column(Float)
+    Electronics_lag_14d = Column(Float)
+    Furniture_lag_14d = Column(Float)
+    Groceries_lag_14d = Column(Float)
+    Sports_lag_14d = Column(Float)
+    Toys_lag_14d = Column(Float)
+
+    # Category units lag 14d features
+    Beauty_units_lag_14d = Column(Float)
+    Books_units_lag_14d = Column(Float)
+    Clothing_units_lag_14d = Column(Float)
+    Electronics_units_lag_14d = Column(Float)
+    Furniture_units_lag_14d = Column(Float)
+    Groceries_units_lag_14d = Column(Float)
+    Sports_units_lag_14d = Column(Float)
+    Toys_units_lag_14d = Column(Float)
+
+    Beauty_lag_28d = Column(Float)
+    Books_lag_28d = Column(Float)
+    Clothing_lag_28d = Column(Float)
+    Electronics_lag_28d = Column(Float)
+    Furniture_lag_28d = Column(Float)
+    Groceries_lag_28d = Column(Float)
+    Sports_lag_28d = Column(Float)
+    Toys_lag_28d = Column(Float)
+
+    # Category units lag 28d features
+    Beauty_units_lag_28d = Column(Float)
+    Books_units_lag_28d = Column(Float)
+    Clothing_units_lag_28d = Column(Float)
+    Electronics_units_lag_28d = Column(Float)
+    Furniture_units_lag_28d = Column(Float)
+    Groceries_units_lag_28d = Column(Float)
+    Sports_units_lag_28d = Column(Float)
+    Toys_units_lag_28d = Column(Float)
+
+    # Rolling average features
+    Beauty_rolling_avg_7d = Column(Float)
+    Books_rolling_avg_7d = Column(Float)
+    Clothing_rolling_avg_7d = Column(Float)
+    Electronics_rolling_avg_7d = Column(Float)
+    Furniture_rolling_avg_7d = Column(Float)
+    Groceries_rolling_avg_7d = Column(Float)
+    Sports_rolling_avg_7d = Column(Float)
+    Toys_rolling_avg_7d = Column(Float)
+
+    # Units rolling average features
+    Beauty_units_rolling_avg_7d = Column(Float)
+    Books_units_rolling_avg_7d = Column(Float)
+    Clothing_units_rolling_avg_7d = Column(Float)
+    Electronics_units_rolling_avg_7d = Column(Float)
+    Furniture_units_rolling_avg_7d = Column(Float)
+    Groceries_units_rolling_avg_7d = Column(Float)
+    Sports_units_rolling_avg_7d = Column(Float)
+    Toys_units_rolling_avg_7d = Column(Float)
+
+    Beauty_rolling_avg_14d = Column(Float)
+    Books_rolling_avg_14d = Column(Float)
+    Clothing_rolling_avg_14d = Column(Float)
+    Electronics_rolling_avg_14d = Column(Float)
+    Furniture_rolling_avg_14d = Column(Float)
+    Groceries_rolling_avg_14d = Column(Float)
+    Sports_rolling_avg_14d = Column(Float)
+    Toys_rolling_avg_14d = Column(Float)
+
+    # Units rolling average 14d features
+    Beauty_units_rolling_avg_14d = Column(Float)
+    Books_units_rolling_avg_14d = Column(Float)
+    Clothing_units_rolling_avg_14d = Column(Float)
+    Electronics_units_rolling_avg_14d = Column(Float)
+    Furniture_units_rolling_avg_14d = Column(Float)
+    Groceries_units_rolling_avg_14d = Column(Float)
+    Sports_units_rolling_avg_14d = Column(Float)
+    Toys_units_rolling_avg_14d = Column(Float)
+
+    Beauty_rolling_avg_28d = Column(Float)
+    Books_rolling_avg_28d = Column(Float)
+    Clothing_rolling_avg_28d = Column(Float)
+    Electronics_rolling_avg_28d = Column(Float)
+    Furniture_rolling_avg_28d = Column(Float)
+    Groceries_rolling_avg_28d = Column(Float)
+    Sports_rolling_avg_28d = Column(Float)
+    Toys_rolling_avg_28d = Column(Float)
+
+    # Units rolling average 28d features
+    Beauty_units_rolling_avg_28d = Column(Float)
+    Books_units_rolling_avg_28d = Column(Float)
+    Clothing_units_rolling_avg_28d = Column(Float)
+    Electronics_units_rolling_avg_28d = Column(Float)
+    Furniture_units_rolling_avg_28d = Column(Float)
+    Groceries_units_rolling_avg_28d = Column(Float)
+    Sports_units_rolling_avg_28d = Column(Float)
+    Toys_units_rolling_avg_28d = Column(Float)
+
+    # Rolling standard deviation features
+    Beauty_rolling_std_7d = Column(Float)
+    Books_rolling_std_7d = Column(Float)
+    Clothing_rolling_std_7d = Column(Float)
+    Electronics_rolling_std_7d = Column(Float)
+    Furniture_rolling_std_7d = Column(Float)
+    Groceries_rolling_std_7d = Column(Float)
+    Sports_rolling_std_7d = Column(Float)
+    Toys_rolling_std_7d = Column(Float)
+
+    # Units rolling std 7d features
+    Beauty_units_rolling_std_7d = Column(Float)
+    Books_units_rolling_std_7d = Column(Float)
+    Clothing_units_rolling_std_7d = Column(Float)
+    Electronics_units_rolling_std_7d = Column(Float)
+    Furniture_units_rolling_std_7d = Column(Float)
+    Groceries_units_rolling_std_7d = Column(Float)
+    Sports_units_rolling_std_7d = Column(Float)
+    Toys_units_rolling_std_7d = Column(Float)
+
+    Beauty_rolling_std_14d = Column(Float)
+    Books_rolling_std_14d = Column(Float)
+    Clothing_rolling_std_14d = Column(Float)
+    Electronics_rolling_std_14d = Column(Float)
+    Furniture_rolling_std_14d = Column(Float)
+    Groceries_rolling_std_14d = Column(Float)
+    Sports_rolling_std_14d = Column(Float)
+    Toys_rolling_std_14d = Column(Float)
+
+    # Units rolling std 14d features
+    Beauty_units_rolling_std_14d = Column(Float)
+    Books_units_rolling_std_14d = Column(Float)
+    Clothing_units_rolling_std_14d = Column(Float)
+    Electronics_units_rolling_std_14d = Column(Float)
+    Furniture_units_rolling_std_14d = Column(Float)
+    Groceries_units_rolling_std_14d = Column(Float)
+    Sports_units_rolling_std_14d = Column(Float)
+    Toys_units_rolling_std_14d = Column(Float)
+
+    Beauty_rolling_std_28d = Column(Float)
+    Books_rolling_std_28d = Column(Float)
+    Clothing_rolling_std_28d = Column(Float)
+    Electronics_rolling_std_28d = Column(Float)
+    Furniture_rolling_std_28d = Column(Float)
+    Groceries_rolling_std_28d = Column(Float)
+    Sports_rolling_std_28d = Column(Float)
+    Toys_rolling_std_28d = Column(Float)
+
+    # Units rolling std 28d features
+    Beauty_units_rolling_std_28d = Column(Float)
+    Books_units_rolling_std_28d = Column(Float)
+    Clothing_units_rolling_std_28d = Column(Float)
+    Electronics_units_rolling_std_28d = Column(Float)
+    Furniture_units_rolling_std_28d = Column(Float)
+    Groceries_units_rolling_std_28d = Column(Float)
+    Sports_units_rolling_std_28d = Column(Float)
+    Toys_units_rolling_std_28d = Column(Float)
+
+    # Date-related features
     year = Column(Integer)
     month = Column(Integer)
     day_of_week = Column(Integer)
-    is_weekend = Column(Integer)
     week_of_year = Column(Integer)
     quarter = Column(Integer)
+    is_weekend = Column(Integer)
     is_month_end = Column(Integer)
     is_month_start = Column(Integer)
     is_november = Column(Integer)
-    Beauty_lag_1 = Column(Float)
-    Books_lag_1 = Column(Float)
-    Clothing_lag_1 = Column(Float)
-    Electronics_lag_1 = Column(Float)
-    Furniture_lag_1 = Column(Float)
-    Groceries_lag_1 = Column(Float)
-    Sports_lag_1 = Column(Float)
-    Toys_lag_1 = Column(Float)
-    Beauty_lag_7 = Column(Float)
-    Books_lag_7 = Column(Float)
-    Clothing_lag_7 = Column(Float)
-    Electronics_lag_7 = Column(Float)
-    Furniture_lag_7 = Column(Float)
-    Groceries_lag_7 = Column(Float)
-    Sports_lag_7 = Column(Float)
-    Toys_lag_7 = Column(Float)
-    Beauty_lag_14 = Column(Float)
-    Books_lag_14 = Column(Float)
-    Clothing_lag_14 = Column(Float)
-    Electronics_lag_14 = Column(Float)
-    Furniture_lag_14 = Column(Float)
-    Groceries_lag_14 = Column(Float)
-    Sports_lag_14 = Column(Float)
-    Toys_lag_14 = Column(Float)
+
+    def __repr__(self):
+        return f"<HistoricalSales(date='{self.date}')>"
+
 
 class Predictions(Base):
-    """SQLAlchemy model for predictions table."""
-    __tablename__ = "predictions"
+    """Model for sales predictions."""
+    __tablename__ = 'predictions'
 
     date = Column(Date, primary_key=True)
-    total_sales = Column(Float)
+
+    # Category sales columns
     Beauty = Column(Float)
     Books = Column(Float)
     Clothing = Column(Float)
@@ -86,65 +275,254 @@ class Predictions(Base):
     Groceries = Column(Float)
     Sports = Column(Float)
     Toys = Column(Float)
+
+    # Category units columns
+    Beauty_units = Column(Float)
+    Books_units = Column(Float)
+    Clothing_units = Column(Float)
+    Electronics_units = Column(Float)
+    Furniture_units = Column(Float)
+    Groceries_units = Column(Float)
+    Sports_units = Column(Float)
+    Toys_units = Column(Float)
+
+    # Category lag features
+    Beauty_lag_1d = Column(Float)
+    Books_lag_1d = Column(Float)
+    Clothing_lag_1d = Column(Float)
+    Electronics_lag_1d = Column(Float)
+    Furniture_lag_1d = Column(Float)
+    Groceries_lag_1d = Column(Float)
+    Sports_lag_1d = Column(Float)
+    Toys_lag_1d = Column(Float)
+
+    # Category units lag features
+    Beauty_units_lag_1d = Column(Float)
+    Books_units_lag_1d = Column(Float)
+    Clothing_units_lag_1d = Column(Float)
+    Electronics_units_lag_1d = Column(Float)
+    Furniture_units_lag_1d = Column(Float)
+    Groceries_units_lag_1d = Column(Float)
+    Sports_units_lag_1d = Column(Float)
+    Toys_units_lag_1d = Column(Float)
+
+    Beauty_lag_7d = Column(Float)
+    Books_lag_7d = Column(Float)
+    Clothing_lag_7d = Column(Float)
+    Electronics_lag_7d = Column(Float)
+    Furniture_lag_7d = Column(Float)
+    Groceries_lag_7d = Column(Float)
+    Sports_lag_7d = Column(Float)
+    Toys_lag_7d = Column(Float)
+
+    # Category units lag 7d features
+    Beauty_units_lag_7d = Column(Float)
+    Books_units_lag_7d = Column(Float)
+    Clothing_units_lag_7d = Column(Float)
+    Electronics_units_lag_7d = Column(Float)
+    Furniture_units_lag_7d = Column(Float)
+    Groceries_units_lag_7d = Column(Float)
+    Sports_units_lag_7d = Column(Float)
+    Toys_units_lag_7d = Column(Float)
+
+    Beauty_lag_14d = Column(Float)
+    Books_lag_14d = Column(Float)
+    Clothing_lag_14d = Column(Float)
+    Electronics_lag_14d = Column(Float)
+    Furniture_lag_14d = Column(Float)
+    Groceries_lag_14d = Column(Float)
+    Sports_lag_14d = Column(Float)
+    Toys_lag_14d = Column(Float)
+
+    # Category units lag 14d features
+    Beauty_units_lag_14d = Column(Float)
+    Books_units_lag_14d = Column(Float)
+    Clothing_units_lag_14d = Column(Float)
+    Electronics_units_lag_14d = Column(Float)
+    Furniture_units_lag_14d = Column(Float)
+    Groceries_units_lag_14d = Column(Float)
+    Sports_units_lag_14d = Column(Float)
+    Toys_units_lag_14d = Column(Float)
+
+    Beauty_lag_28d = Column(Float)
+    Books_lag_28d = Column(Float)
+    Clothing_lag_28d = Column(Float)
+    Electronics_lag_28d = Column(Float)
+    Furniture_lag_28d = Column(Float)
+    Groceries_lag_28d = Column(Float)
+    Sports_lag_28d = Column(Float)
+    Toys_lag_28d = Column(Float)
+
+    # Category units lag 28d features
+    Beauty_units_lag_28d = Column(Float)
+    Books_units_lag_28d = Column(Float)
+    Clothing_units_lag_28d = Column(Float)
+    Electronics_units_lag_28d = Column(Float)
+    Furniture_units_lag_28d = Column(Float)
+    Groceries_units_lag_28d = Column(Float)
+    Sports_units_lag_28d = Column(Float)
+    Toys_units_lag_28d = Column(Float)
+
+    # Rolling average features
+    Beauty_rolling_avg_7d = Column(Float)
+    Books_rolling_avg_7d = Column(Float)
+    Clothing_rolling_avg_7d = Column(Float)
+    Electronics_rolling_avg_7d = Column(Float)
+    Furniture_rolling_avg_7d = Column(Float)
+    Groceries_rolling_avg_7d = Column(Float)
+    Sports_rolling_avg_7d = Column(Float)
+    Toys_rolling_avg_7d = Column(Float)
+
+    # Units rolling average features
+    Beauty_units_rolling_avg_7d = Column(Float)
+    Books_units_rolling_avg_7d = Column(Float)
+    Clothing_units_rolling_avg_7d = Column(Float)
+    Electronics_units_rolling_avg_7d = Column(Float)
+    Furniture_units_rolling_avg_7d = Column(Float)
+    Groceries_units_rolling_avg_7d = Column(Float)
+    Sports_units_rolling_avg_7d = Column(Float)
+    Toys_units_rolling_avg_7d = Column(Float)
+
+    Beauty_rolling_avg_14d = Column(Float)
+    Books_rolling_avg_14d = Column(Float)
+    Clothing_rolling_avg_14d = Column(Float)
+    Electronics_rolling_avg_14d = Column(Float)
+    Furniture_rolling_avg_14d = Column(Float)
+    Groceries_rolling_avg_14d = Column(Float)
+    Sports_rolling_avg_14d = Column(Float)
+    Toys_rolling_avg_14d = Column(Float)
+
+    # Units rolling average 14d features
+    Beauty_units_rolling_avg_14d = Column(Float)
+    Books_units_rolling_avg_14d = Column(Float)
+    Clothing_units_rolling_avg_14d = Column(Float)
+    Electronics_units_rolling_avg_14d = Column(Float)
+    Furniture_units_rolling_avg_14d = Column(Float)
+    Groceries_units_rolling_avg_14d = Column(Float)
+    Sports_units_rolling_avg_14d = Column(Float)
+    Toys_units_rolling_avg_14d = Column(Float)
+
+    Beauty_rolling_avg_28d = Column(Float)
+    Books_rolling_avg_28d = Column(Float)
+    Clothing_rolling_avg_28d = Column(Float)
+    Electronics_rolling_avg_28d = Column(Float)
+    Furniture_rolling_avg_28d = Column(Float)
+    Groceries_rolling_avg_28d = Column(Float)
+    Sports_rolling_avg_28d = Column(Float)
+    Toys_rolling_avg_28d = Column(Float)
+
+    # Units rolling average 28d features
+    Beauty_units_rolling_avg_28d = Column(Float)
+    Books_units_rolling_avg_28d = Column(Float)
+    Clothing_units_rolling_avg_28d = Column(Float)
+    Electronics_units_rolling_avg_28d = Column(Float)
+    Furniture_units_rolling_avg_28d = Column(Float)
+    Groceries_units_rolling_avg_28d = Column(Float)
+    Sports_units_rolling_avg_28d = Column(Float)
+    Toys_units_rolling_avg_28d = Column(Float)
+
+    # Rolling standard deviation features
+    Beauty_rolling_std_7d = Column(Float)
+    Books_rolling_std_7d = Column(Float)
+    Clothing_rolling_std_7d = Column(Float)
+    Electronics_rolling_std_7d = Column(Float)
+    Furniture_rolling_std_7d = Column(Float)
+    Groceries_rolling_std_7d = Column(Float)
+    Sports_rolling_std_7d = Column(Float)
+    Toys_rolling_std_7d = Column(Float)
+
+    # Units rolling std 7d features
+    Beauty_units_rolling_std_7d = Column(Float)
+    Books_units_rolling_std_7d = Column(Float)
+    Clothing_units_rolling_std_7d = Column(Float)
+    Electronics_units_rolling_std_7d = Column(Float)
+    Furniture_units_rolling_std_7d = Column(Float)
+    Groceries_units_rolling_std_7d = Column(Float)
+    Sports_units_rolling_std_7d = Column(Float)
+    Toys_units_rolling_std_7d = Column(Float)
+
+    Beauty_rolling_std_14d = Column(Float)
+    Books_rolling_std_14d = Column(Float)
+    Clothing_rolling_std_14d = Column(Float)
+    Electronics_rolling_std_14d = Column(Float)
+    Furniture_rolling_std_14d = Column(Float)
+    Groceries_rolling_std_14d = Column(Float)
+    Sports_rolling_std_14d = Column(Float)
+    Toys_rolling_std_14d = Column(Float)
+
+    # Units rolling std 14d features
+    Beauty_units_rolling_std_14d = Column(Float)
+    Books_units_rolling_std_14d = Column(Float)
+    Clothing_units_rolling_std_14d = Column(Float)
+    Electronics_units_rolling_std_14d = Column(Float)
+    Furniture_units_rolling_std_14d = Column(Float)
+    Groceries_units_rolling_std_14d = Column(Float)
+    Sports_units_rolling_std_14d = Column(Float)
+    Toys_units_rolling_std_14d = Column(Float)
+
+    Beauty_rolling_std_28d = Column(Float)
+    Books_rolling_std_28d = Column(Float)
+    Clothing_rolling_std_28d = Column(Float)
+    Electronics_rolling_std_28d = Column(Float)
+    Furniture_rolling_std_28d = Column(Float)
+    Groceries_rolling_std_28d = Column(Float)
+    Sports_rolling_std_28d = Column(Float)
+    Toys_rolling_std_28d = Column(Float)
+
+    # Units rolling std 28d features
+    Beauty_units_rolling_std_28d = Column(Float)
+    Books_units_rolling_std_28d = Column(Float)
+    Clothing_units_rolling_std_28d = Column(Float)
+    Electronics_units_rolling_std_28d = Column(Float)
+    Furniture_units_rolling_std_28d = Column(Float)
+    Groceries_units_rolling_std_28d = Column(Float)
+    Sports_units_rolling_std_28d = Column(Float)
+    Toys_units_rolling_std_28d = Column(Float)
+
+    # Date-related features
     year = Column(Integer)
     month = Column(Integer)
     day_of_week = Column(Integer)
-    is_weekend = Column(Integer)
     week_of_year = Column(Integer)
     quarter = Column(Integer)
+    is_weekend = Column(Integer)
     is_month_end = Column(Integer)
     is_month_start = Column(Integer)
     is_november = Column(Integer)
-    Beauty_lag_1 = Column(Float)
-    Books_lag_1 = Column(Float)
-    Clothing_lag_1 = Column(Float)
-    Electronics_lag_1 = Column(Float)
-    Furniture_lag_1 = Column(Float)
-    Groceries_lag_1 = Column(Float)
-    Sports_lag_1 = Column(Float)
-    Toys_lag_1 = Column(Float)
-    Beauty_lag_7 = Column(Float)
-    Books_lag_7 = Column(Float)
-    Clothing_lag_7 = Column(Float)
-    Electronics_lag_7 = Column(Float)
-    Furniture_lag_7 = Column(Float)
-    Groceries_lag_7 = Column(Float)
-    Sports_lag_7 = Column(Float)
-    Toys_lag_7 = Column(Float)
-    Beauty_lag_14 = Column(Float)
-    Books_lag_14 = Column(Float)
-    Clothing_lag_14 = Column(Float)
-    Electronics_lag_14 = Column(Float)
-    Furniture_lag_14 = Column(Float)
-    Groceries_lag_14 = Column(Float)
-    Sports_lag_14 = Column(Float)
-    Toys_lag_14 = Column(Float)
+
+    def __repr__(self):
+        return f"<Predictions(date='{self.date}')>"
+
 
 class Category(Base):
-    """SQLAlchemy model for category table."""
-    __tablename__ = "category"
+    """Model for product categories."""
+    __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, nullable=False)
-    created_at = Column(String, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at = Column(String, server_default=text("CURRENT_TIMESTAMP"))
+    name = Column(String(50), unique=True, index=True)
+    description = Column(String(255), nullable=True)
 
-    # Relationship with Product
+    # Relationship to products
     products = relationship("Product", back_populates="category")
 
+    def __repr__(self):
+        return f"<Category(name='{self.name}')>"
+
+
 class Product(Base):
-    """SQLAlchemy model for product table."""
-    __tablename__ = "product"
+    """Model for products."""
+    __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
-    created_at = Column(String, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at = Column(String, server_default=text("CURRENT_TIMESTAMP"))
+    name = Column(String(100), index=True)
+    category_id = Column(Integer, ForeignKey('categories.id'))
+    price = Column(Float)
 
-    # Relationship with Category
+    # Relationship to category
     category = relationship("Category", back_populates="products")
 
+    def __repr__(self):
+        return f"<Product(name='{self.name}', category_id={self.category_id})>"
 
 def create_tables(conn=None, force=False):
     """
@@ -152,8 +530,8 @@ def create_tables(conn=None, force=False):
     If force is True, drop existing tables and recreate them.
 
     Args:
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
-        force (bool, optional): If True, drop existing tables and recreate them.
+        conn (SQLAlchemy connection, optional): Database connection
+        force (bool, optional): If True, drop existing tables and recreate them
     """
     try:
         # Create connection if not provided
@@ -167,7 +545,9 @@ def create_tables(conn=None, force=False):
             print("Dropping existing tables")
             Base.metadata.drop_all(bind=ENGINE, tables=[
                 HistoricalSales.__table__,
-                Predictions.__table__
+                Predictions.__table__,
+                Product.__table__,
+                Category.__table__
             ])
             print("Tables dropped successfully")
 
@@ -177,7 +557,7 @@ def create_tables(conn=None, force=False):
         print("Database tables created successfully")
 
         # Close connection if we created it
-        if connection_created:
+        if connection_created and conn:
             conn.close()
 
     except Exception as e:
@@ -186,14 +566,15 @@ def create_tables(conn=None, force=False):
             conn.close()
         raise
 
+
 def store_historical_sales(csv_path, conn=None, force=False):
     """
     Store historical sales data from a CSV file in the database.
 
     Args:
         csv_path (str): Path to the CSV file containing historical sales data
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
-        force (bool, optional): If True, existing data will be overwritten without prompting.
+        conn (SQLAlchemy connection, optional): Database connection
+        force (bool, optional): If True, existing data will be overwritten
 
     Returns:
         int: Number of rows inserted
@@ -212,16 +593,14 @@ def store_historical_sales(csv_path, conn=None, force=False):
         print(f"Reading historical sales data from {csv_path}")
         df = pd.read_csv(csv_path, parse_dates=['date'])
 
-        # Remove columns that don't exist in the table
-        columns_to_remove = ['avg_transaction', 'transaction_count', 'unique_categories']
-        for col in columns_to_remove:
-            if col in df.columns:
-                df = df.drop(columns=[col])
-                print(f"Removed column {col} from DataFrame")
+        print(f"CSV data loaded with {len(df)} rows and {len(df.columns)} columns")
 
-        # Ensure date column is in datetime format for PostgreSQL Date type
+        # Ensure date column is in datetime format
         if not pd.api.types.is_datetime64_any_dtype(df['date']):
             df['date'] = pd.to_datetime(df['date'])
+
+        # Fill NaN values
+        df = df.fillna(0)
 
         # Create a session
         session = get_db_session()
@@ -232,37 +611,29 @@ def store_historical_sales(csv_path, conn=None, force=False):
         if existing_count > 0:
             print(f"Database already contains {existing_count} rows of data")
 
-            # If force is False, prompt the user
-            if not force:
-                user_input = input("Do you want to delete existing data and insert new data? (y/n): ")
-                if user_input.lower() != 'y':
-                    print("Operation cancelled by user")
-                    session.close()
-                    if connection_created:
-                        conn.close()
-                    return 0
+            # If force is True, delete existing data
+            if force:
+                session.query(HistoricalSales).delete()
+                session.commit()
+                print("Existing data deleted")
+            else:
+                print("Use force=True to overwrite existing data")
+                session.close()
+                if connection_created:
+                    conn.close()
+                return 0
 
-            # Delete existing data
-            session.query(HistoricalSales).delete()
-            session.commit()
-            print("Existing data deleted")
-
-        # Insert data into database
+        # Insert data into database using bulk operations
         print(f"Inserting {len(df)} rows into database")
-
-        # Convert DataFrame to list of dictionaries
         records = df.to_dict('records')
 
-        # Create HistoricalSales objects and add them to the session
-        for record in records:
-            historical_sales = HistoricalSales(**record)
-            session.add(historical_sales)
-
-        # Commit the session
+        # Use bulk insert for better performance
+        session.bulk_insert_mappings(HistoricalSales, records)
         session.commit()
 
         # Verify insertion
         inserted_count = session.query(HistoricalSales).count()
+        print(f"Successfully inserted {inserted_count} rows into historical_sales table")
 
         # Close session
         session.close()
@@ -271,17 +642,19 @@ def store_historical_sales(csv_path, conn=None, force=False):
         if connection_created:
             conn.close()
 
-        print(f"Successfully inserted {inserted_count} rows into database")
         return inserted_count
 
     except Exception as e:
         print(f"Error storing historical sales data: {e}")
+        import traceback
+        traceback.print_exc()
         if 'session' in locals() and session:
             session.rollback()
             session.close()
         if 'conn' in locals() and conn and connection_created:
             conn.close()
         raise
+
 
 def get_historical_sales(start_date=None, end_date=None, conn=None):
     """
@@ -290,7 +663,7 @@ def get_historical_sales(start_date=None, end_date=None, conn=None):
     Args:
         start_date (str or datetime, optional): Start date for filtering
         end_date (str or datetime, optional): End date for filtering
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
+        conn (SQLAlchemy connection, optional): Database connection
 
     Returns:
         DataFrame: Historical sales data
@@ -325,28 +698,21 @@ def get_historical_sales(start_date=None, end_date=None, conn=None):
                     end_date = end_date.date()
                 query = query.filter(HistoricalSales.date <= end_date)
 
-        # Order by date
-        query = query.order_by(HistoricalSales.date)
+        # Execute query and convert to DataFrame
+        records = query.all()
 
-        # Execute query
-        print(f"Retrieving historical sales data from database")
-        results = query.all()
-
-        # Convert results to DataFrame
+        # Convert to DataFrame
         data = []
-        for result in results:
-            # Convert SQLAlchemy object to dictionary
-            row = {column.name: getattr(result, column.name) for column in result.__table__.columns}
+        for record in records:
+            row = {column.name: getattr(record, column.name) for column in record.__table__.columns}
             data.append(row)
 
-        # Create DataFrame from results
         df = pd.DataFrame(data)
 
-        # Convert date to datetime and set as index
-        if not df.empty:
-            df['date'] = pd.to_datetime(df['date'])
-            df = df.sort_values('date')
-            df.set_index('date', inplace=True)
+        # Set date as index if present
+        if 'date' in df.columns:
+            df = df.set_index('date')
+            df = df.sort_index()
 
         # Close session
         session.close()
@@ -355,191 +721,28 @@ def get_historical_sales(start_date=None, end_date=None, conn=None):
         if connection_created:
             conn.close()
 
-        print(f"Retrieved {len(df)} rows from database")
-        print(f"Columns in historical_sales table: {df.columns.tolist()}")
+        print(f"Retrieved {len(df)} historical sales records")
         return df
 
     except Exception as e:
         print(f"Error retrieving historical sales data: {e}")
+        import traceback
+        traceback.print_exc()
         if 'session' in locals() and session:
             session.close()
         if 'conn' in locals() and conn and connection_created:
             conn.close()
         raise
 
-def populate_categories_and_products(sales_csv_path, conn=None, force=False):
+
+def store_predictions(predictions_df, conn=None, force=False):
     """
-    Extract distinct categories and products from sales data and populate the database tables.
+    Store sales predictions in the database.
 
     Args:
-        sales_csv_path (str): Path to the CSV file containing sales data
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
-        force (bool, optional): If True, drop existing tables and recreate them.
-
-    Returns:
-        tuple: (Number of categories inserted, Number of products inserted)
-    """
-    try:
-        # Create connection if not provided
-        connection_created = False
-        if conn is None:
-            conn = get_db_connection()
-            connection_created = True
-
-        # Create tables if they don't exist
-        create_tables(conn, force=force)
-
-        # Read CSV file
-        print(f"Reading sales data from {sales_csv_path}")
-        df = pd.read_csv(sales_csv_path, parse_dates=['date'])
-
-        # Extract distinct categories
-        categories = df['category'].unique().tolist()
-        print(f"Found {len(categories)} distinct categories")
-
-        # Create a session
-        session = get_db_session()
-
-        # Insert categories into database
-        categories_inserted = 0
-
-        for category_name in categories:
-            try:
-                # Check if category already exists
-                existing_category = session.query(Category).filter_by(name=category_name).first()
-
-                if existing_category is None:
-                    # Category doesn't exist, insert it
-                    new_category = Category(name=category_name)
-                    session.add(new_category)
-                    categories_inserted += 1
-            except Exception as e:
-                print(f"Error inserting category {category_name}: {e}")
-
-        # Commit to get IDs for new categories
-        session.commit()
-        print(f"Inserted {categories_inserted} categories into database")
-
-        # Get category IDs
-        category_map = {}
-        for category_obj in session.query(Category).all():
-            category_map[category_obj.name] = category_obj.id
-
-        # Extract distinct products per category
-        products_df = df[['category', 'product']].drop_duplicates()
-        print(f"Found {len(products_df)} distinct products")
-
-        # Insert products into database
-        products_inserted = 0
-
-        for _, row in products_df.iterrows():
-            category_name = row['category']
-            product_name = row['product']
-            category_id = category_map.get(category_name)
-
-            if category_id:
-                try:
-                    # Check if product already exists
-                    existing_product = session.query(Product).filter_by(
-                        name=product_name, 
-                        category_id=category_id
-                    ).first()
-
-                    if existing_product is None:
-                        # Product doesn't exist, insert it
-                        new_product = Product(
-                            name=product_name,
-                            category_id=category_id
-                        )
-                        session.add(new_product)
-                        products_inserted += 1
-                except Exception as e:
-                    print(f"Error inserting product {product_name} for category {category_name}: {e}")
-            else:
-                print(f"Category ID not found for category: {category_name}")
-
-        # Commit changes
-        session.commit()
-        print(f"Inserted {products_inserted} products into database")
-
-        # Close session
-        session.close()
-
-        # Close connection if we created it
-        if connection_created:
-            conn.close()
-
-        return (categories_inserted, products_inserted)
-
-    except Exception as e:
-        print(f"Error populating categories and products: {e}")
-        if 'session' in locals() and session:
-            session.rollback()
-            session.close()
-        if 'conn' in locals() and conn and connection_created:
-            conn.close()
-        raise
-
-def get_categories(conn=None):
-    """
-    Retrieve all categories from the database.
-
-    Args:
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
-
-    Returns:
-        DataFrame: Categories data
-    """
-    try:
-        # Create connection if not provided
-        connection_created = False
-        if conn is None:
-            conn = get_db_connection()
-            connection_created = True
-
-        # Create a session
-        session = get_db_session()
-
-        # Execute query
-        print("Retrieving categories from database")
-        categories = session.query(Category).order_by(Category.name).all()
-
-        # Convert results to DataFrame
-        data = []
-        for category in categories:
-            # Convert SQLAlchemy object to dictionary
-            row = {column.name: getattr(category, column.name) for column in category.__table__.columns}
-            data.append(row)
-
-        # Create DataFrame from results
-        df = pd.DataFrame(data)
-
-        # Close session
-        session.close()
-
-        # Close connection if we created it
-        if connection_created:
-            conn.close()
-
-        print(f"Retrieved {len(df)} categories from database")
-        return df
-
-    except Exception as e:
-        print(f"Error retrieving categories: {e}")
-        if 'session' in locals() and session:
-            session.close()
-        if 'conn' in locals() and conn and connection_created:
-            conn.close()
-        raise
-
-def store_predictions(df, conn=None, force=False):
-    """
-    Store prediction data in the predictions table.
-
-    Args:
-        df (DataFrame): DataFrame containing prediction data
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
-        force (bool, optional): If True, existing data will be overwritten without prompting.
+        predictions_df (DataFrame): DataFrame containing predictions with date as index
+        conn (SQLAlchemy connection, optional): Database connection
+        force (bool, optional): If True, existing predictions will be overwritten
 
     Returns:
         int: Number of rows inserted
@@ -551,69 +754,49 @@ def store_predictions(df, conn=None, force=False):
             conn = get_db_connection()
             connection_created = True
 
-        # Create tables if they don't exist
-        create_tables(conn, force=force)
+        # Ensure tables exist
+        create_tables(conn)
+
+        # Reset index to make date a column
+        if isinstance(predictions_df.index, pd.DatetimeIndex):
+            predictions_df = predictions_df.reset_index()
+
+        # Ensure date column is in datetime format
+        if not pd.api.types.is_datetime64_any_dtype(predictions_df['date']):
+            predictions_df['date'] = pd.to_datetime(predictions_df['date'])
+
+        # Fill NaN values
+        predictions_df = predictions_df.fillna(0)
 
         # Create a session
         session = get_db_session()
 
-        # Check if data already exists in the database
-        existing_count = session.query(Predictions).count()
-
-        if existing_count > 0:
-            print(f"Predictions table already contains {existing_count} rows of data")
-
-            # If force is False, prompt the user
-            if not force:
-                user_input = input("Do you want to delete existing prediction data and insert new data? (y/n): ")
-                if user_input.lower() != 'y':
-                    print("Operation cancelled by user")
-                    session.close()
-                    if connection_created:
-                        conn.close()
-                    return 0
-
-            # Delete existing data
+        # If force is True, delete all existing predictions
+        if force:
             session.query(Predictions).delete()
             session.commit()
-            print("Existing prediction data deleted")
+            print("Deleted all existing predictions")
 
-        # Ensure date column is in datetime format for PostgreSQL Date type
-        if 'date' in df.columns:
-            if not pd.api.types.is_datetime64_any_dtype(df['date']):
-                df['date'] = pd.to_datetime(df['date'])
+        # Otherwise, delete predictions for the specific dates in the DataFrame
+        else:
+            dates = predictions_df['date'].dt.date.tolist()
+            if dates:
+                deleted = session.query(Predictions).filter(Predictions.date.in_(dates)).delete(
+                    synchronize_session='fetch')
+                session.commit()
+                print(f"Deleted {deleted} existing predictions for the specified date range")
 
-        # Remove columns that don't exist in the table
-        columns_to_remove = ['avg_transaction', 'transaction_count', 'unique_categories']
-        for col in columns_to_remove:
-            if col in df.columns:
-                df = df.drop(columns=[col])
-                print(f"Removed column {col} from DataFrame")
+        # Insert data into database using bulk operations
+        print(f"Inserting {len(predictions_df)} predictions into database")
+        records = predictions_df.to_dict('records')
 
-        # Check for duplicate dates
-        duplicate_dates = df['date'].duplicated()
-        if duplicate_dates.any():
-            print(f"Found {duplicate_dates.sum()} duplicate dates in predictions DataFrame")
-            print(f"Example duplicate date: {df.loc[duplicate_dates, 'date'].iloc[0]}")
-            print("Dropping duplicate dates from predictions DataFrame")
-            df = df.drop_duplicates(subset=['date'])
-
-        # Insert data into database
-        print(f"Inserting {len(df)} rows into predictions table")
-
-        # Convert DataFrame to list of dictionaries
-        records = df.to_dict('records')
-
-        # Create Predictions objects and add them to the session
-        for record in records:
-            prediction = Predictions(**record)
-            session.add(prediction)
-
-        # Commit the session
+        # Use bulk insert for better performance
+        session.bulk_insert_mappings(Predictions, records)
         session.commit()
 
         # Verify insertion
         inserted_count = session.query(Predictions).count()
+        print(f"Successfully inserted/updated predictions. Total predictions in database: {inserted_count}")
 
         # Close session
         session.close()
@@ -622,11 +805,12 @@ def store_predictions(df, conn=None, force=False):
         if connection_created:
             conn.close()
 
-        print(f"Successfully inserted {inserted_count} rows into predictions table")
-        return inserted_count
+        return len(predictions_df)
 
     except Exception as e:
-        print(f"Error storing prediction data: {e}")
+        print(f"Error storing predictions: {e}")
+        import traceback
+        traceback.print_exc()
         if 'session' in locals() and session:
             session.rollback()
             session.close()
@@ -634,17 +818,18 @@ def store_predictions(df, conn=None, force=False):
             conn.close()
         raise
 
+
 def get_predictions(start_date=None, end_date=None, conn=None):
     """
-    Retrieve prediction data from the database.
+    Retrieve predictions from the database.
 
     Args:
         start_date (str or datetime, optional): Start date for filtering
         end_date (str or datetime, optional): End date for filtering
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
+        conn (SQLAlchemy connection, optional): Database connection
 
     Returns:
-        DataFrame: Prediction data
+        DataFrame: Predictions data
     """
     try:
         # Create connection if not provided
@@ -676,28 +861,21 @@ def get_predictions(start_date=None, end_date=None, conn=None):
                     end_date = end_date.date()
                 query = query.filter(Predictions.date <= end_date)
 
-        # Order by date
-        query = query.order_by(Predictions.date)
+        # Execute query and convert to DataFrame
+        records = query.all()
 
-        # Execute query
-        print(f"Retrieving prediction data from database")
-        results = query.all()
-
-        # Convert results to DataFrame
+        # Convert to DataFrame
         data = []
-        for result in results:
-            # Convert SQLAlchemy object to dictionary
-            row = {column.name: getattr(result, column.name) for column in result.__table__.columns}
+        for record in records:
+            row = {column.name: getattr(record, column.name) for column in record.__table__.columns}
             data.append(row)
 
-        # Create DataFrame from results
         df = pd.DataFrame(data)
 
-        # Convert date to datetime
-        if not df.empty and 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'])
-            df = df.sort_values('date')
-            df.set_index('date', inplace=True)
+        # Set date as index if present
+        if 'date' in df.columns:
+            df = df.set_index('date')
+            df = df.sort_index()
 
         # Close session
         session.close()
@@ -706,27 +884,191 @@ def get_predictions(start_date=None, end_date=None, conn=None):
         if connection_created:
             conn.close()
 
-        print(f"Retrieved {len(df)} rows from predictions table")
-        if not df.empty:
-            print(f"Date range: {df['date'].min()} to {df['date'].max()}")
-            print(f"Columns in predictions table: {df.columns.tolist()}")
+        print(f"Retrieved {len(df)} prediction records")
         return df
 
     except Exception as e:
-        print(f"Error retrieving prediction data: {e}")
+        print(f"Error retrieving predictions: {e}")
+        import traceback
+        traceback.print_exc()
         if 'session' in locals() and session:
             session.close()
         if 'conn' in locals() and conn and connection_created:
             conn.close()
         raise
 
+
+def populate_categories_and_products(sales_csv_path, conn=None, force=False):
+    """
+    Populate the category and product tables from a sales CSV file.
+
+    Args:
+        sales_csv_path (str): Path to the CSV file containing sales data
+        conn (SQLAlchemy connection, optional): Database connection
+        force (bool, optional): If True, existing data will be overwritten
+
+    Returns:
+        tuple: (categories_count, products_count) - Number of categories and products inserted
+    """
+    try:
+        # Create connection if not provided
+        connection_created = False
+        if conn is None:
+            conn = get_db_connection()
+            connection_created = True
+
+        # Create tables if they don't exist
+        create_tables(conn)
+
+        # Create a session
+        session = get_db_session()
+
+        # Check if data already exists in the database
+        existing_categories = session.query(Category).count()
+        existing_products = session.query(Product).count()
+
+        if existing_categories > 0 or existing_products > 0:
+            print(f"Database already contains {existing_categories} categories and {existing_products} products")
+
+            # If force is True, delete existing data
+            if force:
+                session.query(Product).delete()
+                session.query(Category).delete()
+                session.commit()
+                print("Existing categories and products deleted")
+            else:
+                print("Use force=True to overwrite existing data")
+                session.close()
+                if connection_created:
+                    conn.close()
+                return (existing_categories, existing_products)
+
+        # Read CSV file to extract categories and products
+        print(f"Reading sales data from {sales_csv_path}")
+        df = pd.read_csv(sales_csv_path)
+
+        if 'category' not in df.columns or 'product' not in df.columns:
+            raise ValueError("CSV must contain 'category' and 'product' columns")
+
+        # Extract unique categories and products
+        categories_df = df[['category']].drop_duplicates()
+
+        # Insert categories
+        print(f"Inserting {len(categories_df)} categories")
+        category_map = {}  # To store category_name -> category_id mapping
+
+        for _, row in categories_df.iterrows():
+            category_name = row['category']
+            category = Category(name=category_name)
+            session.add(category)
+            session.flush()  # Get the ID before committing
+            category_map[category_name] = category.id
+
+        session.commit()
+
+        # Extract unique product-category pairs
+        products_df = df[['product', 'category']].drop_duplicates()
+
+        # Insert products
+        print(f"Inserting {len(products_df)} products")
+        for _, row in products_df.iterrows():
+            product_name = row['product']
+            category_name = row['category']
+            category_id = category_map.get(category_name)
+
+            if category_id:
+                product = Product(name=product_name, category_id=category_id)
+                session.add(product)
+            else:
+                print(f"Warning: Category '{category_name}' not found for product '{product_name}'")
+
+        session.commit()
+
+        # Verify insertion
+        inserted_categories = session.query(Category).count()
+        inserted_products = session.query(Product).count()
+
+        print(f"Successfully inserted {inserted_categories} categories and {inserted_products} products")
+
+        # Close session
+        session.close()
+
+        # Close connection if we created it
+        if connection_created:
+            conn.close()
+
+        return (inserted_categories, inserted_products)
+
+    except Exception as e:
+        print(f"Error populating categories and products: {e}")
+        import traceback
+        traceback.print_exc()
+        if 'session' in locals() and session:
+            session.rollback()
+            session.close()
+        if 'conn' in locals() and conn and connection_created:
+            conn.close()
+        raise
+
+
+def get_categories(conn=None):
+    """
+    Retrieve all categories from the database.
+
+    Args:
+        conn (SQLAlchemy connection, optional): Database connection
+
+    Returns:
+        DataFrame: Categories data
+    """
+    try:
+        # Create connection if not provided
+        connection_created = False
+        if conn is None:
+            conn = get_db_connection()
+            connection_created = True
+
+        # Create a session
+        session = get_db_session()
+
+        # Query categories
+        categories = session.query(Category).order_by(Category.name).all()
+
+        # Convert to DataFrame
+        data = []
+        for category in categories:
+            row = {column.name: getattr(category, column.name) for column in category.__table__.columns}
+            data.append(row)
+
+        # Create DataFrame
+        df = pd.DataFrame(data)
+
+        # Close session
+        session.close()
+
+        # Close connection if we created it
+        if connection_created:
+            conn.close()
+
+        print(f"Retrieved {len(df)} categories")
+        return df
+
+    except Exception as e:
+        print(f"Error retrieving categories: {e}")
+        if 'session' in locals() and session:
+            session.close()
+        if 'conn' in locals() and conn and connection_created:
+            conn.close()
+        raise
+
+
 def get_products(category_id=None, conn=None):
     """
     Retrieve products from the database, optionally filtered by category.
 
     Args:
-        category_id (int, optional): Category ID to filter by
-        conn (SQLAlchemy connection, optional): Database connection. If None, a new connection will be created.
+        category_id (int, optional): Category ID for filtering
+        conn (SQLAlchemy connection, optional): Database connection
 
     Returns:
         DataFrame: Products data
@@ -742,8 +1084,7 @@ def get_products(category_id=None, conn=None):
         session = get_db_session()
 
         # Build query
-        query = session.query(Product, Category.name.label('category_name')).\
-            join(Category, Product.category_id == Category.id)
+        query = session.query(Product).join(Category)
 
         # Add category filter if provided
         if category_id:
@@ -753,18 +1094,17 @@ def get_products(category_id=None, conn=None):
         query = query.order_by(Category.name, Product.name)
 
         # Execute query
-        print(f"Retrieving products from database")
-        results = query.all()
+        products = query.all()
 
-        # Convert results to DataFrame
+        # Convert to DataFrame
         data = []
-        for product, category_name in results:
-            # Convert SQLAlchemy object to dictionary
+        for product in products:
             row = {column.name: getattr(product, column.name) for column in product.__table__.columns}
-            row['category_name'] = category_name
+            # Add category name
+            row['category_name'] = product.category.name
             data.append(row)
 
-        # Create DataFrame from results
+        # Create DataFrame
         df = pd.DataFrame(data)
 
         # Close session
@@ -774,7 +1114,8 @@ def get_products(category_id=None, conn=None):
         if connection_created:
             conn.close()
 
-        print(f"Retrieved {len(df)} products from database")
+        filter_msg = f" for category ID {category_id}" if category_id else ""
+        print(f"Retrieved {len(df)} products{filter_msg}")
         return df
 
     except Exception as e:

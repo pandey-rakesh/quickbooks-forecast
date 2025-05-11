@@ -6,7 +6,7 @@ import TimeSeriesChart from './TimeSeriesChart';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import ApiService from '../services/api';
-import { format, parseISO } from 'date-fns'; // Import date-fns functions
+import { format, parseISO } from 'date-fns';
 
 const Dashboard = () => {
   // State
@@ -40,6 +40,9 @@ const Dashboard = () => {
         );
         setTopCategories(categoriesData);
 
+        // Log the top categories data structure for debugging
+        console.log('Top Categories Data:', categoriesData);
+
         // Get time series data
         const seriesData = await ApiService.getTimeSeriesData(
           timeRange === 'custom' ? customDateRange.startDate : null,
@@ -49,6 +52,7 @@ const Dashboard = () => {
           180
         );
         setTimeSeriesData(seriesData);
+
 
         setLoading(false);
       } catch (err) {
@@ -79,11 +83,12 @@ const Dashboard = () => {
     }
   };
 
+
   return (
     <Container maxWidth="lg" sx={{ mb: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Sales Forecast
+          Sales Forecasting
         </Typography>
         <Typography variant="subtitle1" color="textSecondary">
           Predict top-selling categories to optimize your inventory and marketing strategy
@@ -132,6 +137,7 @@ const Dashboard = () => {
                   <Typography variant="body1" sx={{ mt: 1 }}>
                     <strong>Range:</strong> {topCategories.range.charAt(0).toUpperCase() + topCategories.range.slice(1)}
                   </Typography>
+
 
                   {modelInfo && (
                     <>

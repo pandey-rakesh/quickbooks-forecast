@@ -227,39 +227,6 @@ Generate time series data for top N categories showing historical and predicted 
 - `top_n` (optional, default: 5): Number of top categories to show
 - `historical_days` (optional, default: 180): Number of days of historical data to include
 
-### Web Application
-
-The project includes a React-based web application that provides a user-friendly interface for visualizing sales forecasts and historical data.
-
-#### Features
-
-- Interactive dashboard for sales forecasting visualization
-- Time range selector for different forecast periods (week, month, quarter, year, custom)
-- Bar chart displaying top categories by sales
-- Time series chart showing historical and predicted sales trends
-- Forecast details including model information
-
-#### Running the Web Application
-
-1. Navigate to the webapp directory:
-   ```bash
-   cd webapp
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to access the web application.
-
-For more details about the web application, see the [webapp README](webapp/README.md).
-
 ### Database Operations
 
 The project includes functionality to store and retrieve data from a PostgreSQL database:

@@ -31,11 +31,10 @@ API_PREFIX = "/api/v1"
 # Prediction settings
 DEFAULT_FORECAST_DAYS = 30
 DEFAULT_TOP_CATEGORIES = 5
-CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence score for predictions
 
 # Feature engineering settings
 LAG_DAYS = [1, 7, 30]  # Days to lag for creating lag features
-ROLLING_WINDOWS = [7, 30]  # Window sizes for rolling statistics
+ROLLING_WINDOWS = [7, 14, 28]  # Window sizes for rolling statistics
 
 # Cache settings
 CACHE_EXPIRATION = 3600  # Cache expiration time in seconds (1 hour)

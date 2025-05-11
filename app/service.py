@@ -160,7 +160,7 @@ class ForecastService:
             self.logger.info(f"Generating features for prediction period {start_date} to {end_date}")
 
             # Use FeatureBuilder to generate features for the entire date range
-            features_df = self.feature_builder.get_model_features(
+            features_df = self.feature_builder.generate_features(
                 start_date=start_date,
                 end_date=end_date,
                 historical_data=historical_data
@@ -180,92 +180,36 @@ class ForecastService:
             # Log model type for debugging
             self.logger.info(f"Model type: {type(self.model).__name__}")
 
-            # Create mock predictions if requested via environment variable
-            use_mock = os.environ.get('USE_MOCK_PREDICTIONS', '').lower() == 'true'
+            # Generate predictions
+            for target_date in date_range:
+                # Get features for this specific date
+                date_features = features_df.loc[features_df.index == target_date]
 
-            if use_mock:
-                self.logger.info("Using mock predictions as requested")
-                import random
-                for target_date in date_range:
-                    for category in target_categories:
-                        # Generate random amount between 1000 and 5000
-                        amount = random.uniform(1000, 5000)
-                        predictions.append({
-                            "date": target_date.strftime("%Y-%m-%d"),
-                            "category": category,
-                            "amount": float(amount),
-                            "confidence": 0.85
-                        })
-            else:
-                # Generate actual predictions
-                for target_date in date_range:
-                    # Get features for this specific date
-                    date_features = features_df.loc[features_df.index == target_date]
+                if date_features.empty:
+                    self.logger.warning(f"No features available for {target_date}, skipping")
+                    continue
 
-                    if date_features.empty:
-                        self.logger.warning(f"No features available for {target_date}, skipping")
-                        continue
+                # Make a single prediction for all categories
+                # Generate a single set of predictions for all categories
+                # This assumes the model outputs a single value or an array with
+                # one value per category
+                model_predictions = self.model.predict(date_features)
 
-                    # Make a single prediction for all categories
-                    try:
-                        # Generate a single set of predictions for all categories
-                        # This assumes the model outputs a single value or an array with
-                        # one value per category
-                        model_predictions = self.model.predict(date_features)
+                # Check the shape of predictions
+                if hasattr(model_predictions, 'shape'):
+                    self.logger.info(f"Model prediction shape: {model_predictions.shape}")
 
-                        # Check the shape of predictions
-                        if hasattr(model_predictions, 'shape'):
-                            self.logger.info(f"Model prediction shape: {model_predictions.shape}")
+                if isinstance(model_predictions, (list, np.ndarray)):
+                    pred_array = model_predictions.flatten()  # ensure 1D array
 
-                        # Handle different model output formats
-                        if isinstance(model_predictions, (list, np.ndarray)) and len(model_predictions) > 1:
-                            # If model returns an array with multiple values
-                            pred_array = model_predictions
-
-                            # Map predictions to categories
-                            for i, category in enumerate(target_categories):
-                                if i < len(pred_array):
-                                    predictions.append({
-                                        "date": target_date.strftime("%Y-%m-%d"),
-                                        "category": category,
-                                        "amount": float(pred_array[i]),
-                                        "confidence": 0.85
-                                    })
-                        else:
-                            # If model returns a single value or a single-element array
-                            # Use the same value for all categories
-                            if isinstance(model_predictions, (list, np.ndarray)):
-                                pred_value = model_predictions[0] if len(model_predictions) > 0 else 0
-                            else:
-                                pred_value = model_predictions
-
-                            # Add prediction for each category
-                            for category in target_categories:
-                                predictions.append({
-                                    "date": target_date.strftime("%Y-%m-%d"),
-                                    "category": category,
-                                    "amount": float(pred_value),
-                                    "confidence": 0.85
-                                })
-                    except Exception as e:
-                        self.logger.error(f"Error in model prediction: {e}")
-                        # Try an alternative approach - predict for each category separately
-                        for category in target_categories:
-                            try:
-                                # Generate a fixed value for testing
-                                import random
-                                mock_value = random.uniform(1000, 5000)
-
-                                predictions.append({
-                                    "date": target_date.strftime("%Y-%m-%d"),
-                                    "category": category,
-                                    "amount": float(mock_value),
-                                    "confidence": 0.7  # Lower confidence for fallback predictions
-                                })
-                                self.logger.info(f"Using fallback prediction for {category} on {target_date}")
-                            except Exception as inner_e:
-                                self.logger.warning(
-                                    f"Error in fallback prediction for {category} on {target_date}: {inner_e}")
+                    # Map predictions to categories
+                    for i, category in enumerate(target_categories):
+                        if i < len(pred_array):
+                            predictions.append({
+                                "date": target_date.strftime("%Y-%m-%d"),
+                                "category": category,
+                                "amount": float(pred_array[i])
+                            })
 
             # Check if we have any predictions
             if not predictions:
@@ -290,17 +234,11 @@ class ForecastService:
                 # Calculate percentage of total
                 percentage = (row["amount"] / total_predicted_sales) * 100 if total_predicted_sales > 0 else 0
 
-                # Get average confidence for this category
-                category_confidence = predictions_df[
-                    predictions_df["category"] == row["category"]
-                    ]["confidence"].mean()
-
                 # Add to list
                 top_categories_list.append({
                     "category": row["category"],
                     "amount": float(row["amount"]),
-                    "percentage": float(percentage),
-                    "confidence": float(category_confidence)
+                    "percentage": float(percentage)
                 })
 
             # Prepare response
@@ -490,9 +428,7 @@ class ForecastService:
                 top_categories_formatted.append({
                     "category": category,
                     "amount": float(amount),
-                    "percentage": float(percentage),
-                    # Add a confidence score that's lower for categories with more predicted data
-                    "confidence": 0.95  # You could calculate this based on % of real vs predicted data
+                    "percentage": float(percentage)
                 })
 
             # Count real vs predicted data points
@@ -525,6 +461,7 @@ class ForecastService:
             # Provide more informative error that also mentions the hybrid approach
             raise ValueError(
                 f"Unable to retrieve sufficient historical or predicted data for period {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}: {str(e)}")
+
 
     def _get_date_chunks(self, date_index):
         """
@@ -670,4 +607,3 @@ class ForecastService:
         except Exception as e:
             self.logger.error(f"Error generating time series data: {e}")
             raise ValueError(f"Error generating time series data: {str(e)}")
-
