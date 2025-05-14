@@ -10,7 +10,7 @@ import './styles/App.css';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2CA01C', // QuickBooks green
+      main: '#14324F', // QuickBooks green
     },
     secondary: {
       main: '#375361', // QuickBooks dark blue

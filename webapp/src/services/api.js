@@ -38,6 +38,23 @@ export const ApiService = {
     }
   },
 
+  // Get data for top categories with last year comparison
+  getTopCategoriesWithLastYear: async (range = 'month', startDate = null, endDate = null, topN = 5) => {
+    let url = `/api/v1/categories/top-with-last-year?range=${range}&top_n=${topN}`;
+
+    if (range === 'custom' && startDate && endDate) {
+      url += `&start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    try {
+      const response = await axios.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching top categories with last year comparison:', error);
+      throw new Error('Failed to fetch top categories with last year comparison');
+    }
+  },
+
   // Get time series data for categories
   getTimeSeriesData: async (startDate = null, endDate = null, days = 30, topN = 5, historicalDays = 180) => {
     try {

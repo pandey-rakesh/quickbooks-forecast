@@ -607,3 +607,92 @@ class ForecastService:
         except Exception as e:
             self.logger.error(f"Error generating time series data: {e}")
             raise ValueError(f"Error generating time series data: {str(e)}")
+
+    def get_historical_data_for_categories(
+            self,
+            start_date: datetime,
+            end_date: datetime,
+            categories: List[str]
+    ) -> Dict[str, Any]:
+        """
+        Get historical data for specific categories for a given time period.
+
+        Args:
+            start_date (datetime): Start date for historical data
+            end_date (datetime): End date for historical data
+            categories (List[str]): List of category names to get data for
+
+        Returns:
+            dict: Historical data for the specified categories
+        """
+        try:
+            self.logger.info(f"Getting historical data for specific categories from {start_date} to {end_date}")
+
+            # Get historical data from database
+            historical_df = self.get_historical_sales(start_date=start_date, end_date=end_date)
+
+            # If no historical data at all, return empty result with proper structure
+            if historical_df is None or historical_df.empty:
+                self.logger.warning(f"No historical data found for period {start_date} to {end_date}")
+                return {
+                    "period": {
+                        "start_date": start_date.strftime("%Y-%m-%d"),
+                        "end_date": end_date.strftime("%Y-%m-%d"),
+                        "days": (end_date - start_date).days + 1
+                    },
+                    "categories_found": [],
+                    "categories_missing": categories,
+                    "total_sales": 0.0,
+                    "total_sales_formatted": format_currency(0.0),
+                    "category_data": {}
+                }
+
+            # Extract available category columns from historical data
+            available_categories = [col for col in historical_df.columns
+                                    if col in categories]
+
+            missing_categories = [cat for cat in categories if cat not in available_categories]
+
+            # Calculate totals for each requested category
+            category_totals = {}
+            for category in available_categories:
+                # Sum the sales for this category
+                category_totals[category] = historical_df[category].sum()
+
+            # For missing categories, set total to 0
+            for category in missing_categories:
+                category_totals[category] = 0.0
+
+            # Calculate total sales for all requested categories
+            total_sales = sum(category_totals.values())
+
+            # Format response
+            category_data = {}
+            for category, amount in category_totals.items():
+                percentage = (amount / total_sales * 100) if total_sales > 0 else 0
+
+                category_data[category] = {
+                    "amount": float(amount),
+                    "percentage": float(percentage)
+                }
+
+            # Construct the response
+            response = {
+                "period": {
+                    "start_date": start_date.strftime("%Y-%m-%d"),
+                    "end_date": end_date.strftime("%Y-%m-%d"),
+                    "days": (end_date - start_date).days + 1
+                },
+                "categories_found": available_categories,
+                "categories_missing": missing_categories,
+                "total_sales": float(total_sales),
+                "total_sales_formatted": format_currency(total_sales),
+                "category_data": category_data
+            }
+
+            return response
+
+        except Exception as e:
+            self.logger.error(f"Error getting historical data for specific categories: {e}")
+            raise ValueError(f"Error getting historical data for specific categories: {str(e)}")
+

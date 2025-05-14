@@ -186,7 +186,7 @@ const TimeSeriesChart = ({ data }) => {
       <ResponsiveContainer width="100%" height="100%">  {/* Increased from 85% to 90% */}
         <LineChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis

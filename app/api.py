@@ -277,3 +277,179 @@ async def time_series_plot(
         # Handle any other unexpected exceptions
         logging.error(f"Error in time-series-plot endpoint: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@router.get("/categories/top-with-last-year")
+async def get_top_categories_with_last_year(
+        range: str = Query("month", description="Time range (week, month, quarter, year, custom)"),
+        start_date: Optional[str] = Query(None, description="Start date for custom range (YYYY-MM-DD)"),
+        end_date: Optional[str] = Query(None, description="End date for custom range (YYYY-MM-DD)"),
+        top_n: int = Query(DEFAULT_TOP_CATEGORIES, description="Number of top categories to return")
+):
+    """
+    Get top-N predicted categories with comparison to the same period last year.
+
+    Args:
+        range (str, optional): Time range (week, month, quarter, year, custom). Defaults to "month".
+        start_date (str, optional): Start date for custom range (YYYY-MM-DD)
+        end_date (str, optional): End date for custom range (YYYY-MM-DD)
+        top_n (int, optional): Number of top categories to return
+
+    Returns:
+        dict: Top categories with last year's data for the specified time range
+    """
+    try:
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # Calculate date range based on specified time frame
+        if range == "week":
+            start_dt = today
+            end_dt = today + timedelta(days=6)
+        elif range == "month":
+            # Get the first day of next month
+            if today.month == 12:
+                next_month = datetime(today.year + 1, 1, 1)
+            else:
+                next_month = datetime(today.year, today.month + 1, 1)
+
+            # Calculate days in current month
+            days_in_month = (next_month - today).days
+
+            start_dt = today
+            end_dt = today + timedelta(days=days_in_month - 1)
+        elif range == "quarter":
+            # Calculate a quarter (3 months) from today
+            month = today.month
+            year = today.year
+
+            # Calculate the end month and year
+            end_month = month + 3
+            end_year = year
+            if end_month > 12:
+                end_month -= 12
+                end_year += 1
+
+            # Get the first day of the month after the quarter ends
+            if end_month == 12:
+                quarter_end = datetime(end_year + 1, 1, 1)
+            else:
+                quarter_end = datetime(end_year, end_month + 1, 1)
+
+            # Calculate days in the quarter
+            days_in_quarter = (quarter_end - today).days
+
+            start_dt = today
+            end_dt = today + timedelta(days=days_in_quarter - 1)
+        elif range == "year":
+            # Get the first day of next year
+            next_year = datetime(today.year + 1, 1, 1)
+
+            # Calculate days in current year
+            days_in_year = (next_year - today).days
+
+            start_dt = today
+            end_dt = today + timedelta(days=days_in_year - 1)
+        elif range == "custom":
+            if not start_date or not end_date:
+                raise HTTPException(
+                    status_code=400,
+                    detail="start_date and end_date are required for custom range"
+                )
+            start_dt, end_dt = parse_date_range(start_date, end_date)
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid range. Must be one of: week, month, quarter, year, custom"
+            )
+
+        # Get predictions for the calculated date range
+        predictions = forecast_service.predict_top_categories(
+            start_date=start_dt,
+            end_date=end_dt,
+            top_n=top_n
+        )
+
+        # Extract category names from predictions
+        top_category_names = [item["category"] for item in predictions["predicted_top_categories"]]
+
+        # Calculate the same period last year
+        last_year_start = start_dt.replace(year=start_dt.year - 1)
+        last_year_end = end_dt.replace(year=end_dt.year - 1)
+
+        # Get historical data for these specific categories
+        last_year_data = forecast_service.get_historical_data_for_categories(
+            start_date=last_year_start,
+            end_date=last_year_end,
+            categories=top_category_names
+        )
+
+        # Format response
+        response = {
+            "range": range,
+            "period": {
+                "current": {
+                    "start_date": start_dt.strftime("%Y-%m-%d"),
+                    "end_date": end_dt.strftime("%Y-%m-%d"),
+                },
+                "last_year": {
+                    "start_date": last_year_start.strftime("%Y-%m-%d"),
+                    "end_date": last_year_end.strftime("%Y-%m-%d"),
+                }
+            },
+            "top_categories": []
+        }
+
+        # Combine data for current and last year periods
+        for item in predictions["predicted_top_categories"]:
+            category_name = item["category"]
+            last_year_category_data = last_year_data["category_data"].get(category_name,
+                                                                          {"amount": 0.0, "percentage": 0.0})
+
+            category_data = {
+                "category": category_name,
+                "current_revenue": item["amount"],
+                "current_percentage": item["percentage"],
+                "last_year_revenue": last_year_category_data["amount"],
+                "last_year_percentage": last_year_category_data["percentage"]
+            }
+
+            # Calculate year-over-year change
+            if last_year_category_data["amount"] > 0:
+                yoy_change = ((item["amount"] - last_year_category_data["amount"]) /
+                              last_year_category_data["amount"]) * 100
+                category_data["yoy_change_percent"] = round(yoy_change, 2)
+            else:
+                category_data["yoy_change_percent"] = None
+
+            response["top_categories"].append(category_data)
+
+        # Add summary stats
+        response["totals"] = {
+            "current": {
+                "total": float(predictions["total_predicted_sales"]),
+                "formatted": predictions["total_predicted_sales_formatted"]
+            },
+            "last_year": {
+                "total": float(last_year_data["total_sales"]),
+                "formatted": last_year_data["total_sales_formatted"]
+            }
+        }
+
+        # Calculate total YoY change
+        if last_year_data["total_sales"] > 0:
+            total_yoy_change = ((predictions["total_predicted_sales"] - last_year_data["total_sales"]) /
+                                last_year_data["total_sales"]) * 100
+            response["totals"]["yoy_change_percent"] = round(total_yoy_change, 2)
+        else:
+            response["totals"]["yoy_change_percent"] = None
+
+        return response
+
+    except ValueError as e:
+        # Handle specific ValueError exceptions from the service
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Handle any other unexpected exceptions
+        logging.error(f"Error in categories/top-with-last-year endpoint: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+

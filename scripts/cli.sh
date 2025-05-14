@@ -27,6 +27,7 @@ function show_help {
     echo "  model-info              Test the model-info endpoint"
     echo "  categories              Test the categories/top endpoint"
     echo "  time-series             Test the categories/time-series-plot endpoint"
+    echo "  top-with-last-year       Test the categories/top-with-last-year endpoint"
     echo "  all                     Test all endpoints"
     echo ""
     echo "Examples:"
@@ -130,6 +131,21 @@ function test_time_series {
     echo ""
 }
 
+# Function to test the categories/top-with-last-year endpoint
+function test_top_with_last_year {
+    echo "Testing categories/top-with-last-year endpoint..."
+
+    # Check if additional parameters were provided
+    if [ -n "$1" ]; then
+        echo "With parameters: $1"
+        curl -s "$BASE_URL/categories/top-with-last-year?$1" | format_json
+    else
+        # Default call without parameters
+        curl -s "$BASE_URL/categories/top-with-last-year" | format_json
+    fi
+    echo ""
+}
+
 # Function to test all endpoints
 function test_all {
     # Pass any parameters to each test function
@@ -138,6 +154,7 @@ function test_all {
     test_historical "$1"
     test_categories "$1"
     test_time_series "$1"
+    test_top_with_last_year "$1"
 }
 
 # Parse command line arguments
@@ -199,6 +216,9 @@ case "$COMMAND" in
         ;;
     time-series)
         test_time_series "$PARAMS"
+        ;;
+    top-with-last-year)
+        test_top_with_last_year "$PARAMS"
         ;;
     all)
         test_all "$PARAMS"
